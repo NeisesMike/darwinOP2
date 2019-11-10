@@ -37,9 +37,6 @@ class Player
 {
     public:
 
-        // initialize the framework
-        void init();
-
         // associate each card with a location ( a 2Dpos a la gaze )
         // allow for some error plox
         void calibrateVision();

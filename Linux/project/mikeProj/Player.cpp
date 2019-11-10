@@ -13,13 +13,6 @@ Player::Player()
     }
 }
 
-void Player::init()
-{
-    return;
-}
-
-
-
 // TODO
 void Player::calibrateVision()
 {
