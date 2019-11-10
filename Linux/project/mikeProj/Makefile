@@ -9,12 +9,12 @@
 
 TARGET = game
 
-INCLUDE_DIRS = -I../../include -I../../../Framework/include
+INCLUDE_DIRS = -I../../include -I../../../Framework/include -I/usr/share/festival/festival/src/include -I/usr/include/speech_tools/ ../../lib/darwin.a
 
 CXX = g++ 
 CXXFLAGS += -O2 -DLINUX -Wall $(INCLUDE_DIRS)
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -Wall $(INCLUDE_DIRS)
-LFLAGS += -lpthread -lrt -ljpeg
+LFLAGS += -lpthread -lrt -ljpeg -lFestival -lestools -leststring /usr/lib/libestbase.a 
 
 OBJECTS = StatusCheck.o Player.o main.o
 
@@ -35,10 +35,11 @@ darwin.a:
 	make -C ../../build
 
 $(TARGET): darwin.a $(OBJECTS)
-	$(CXX) $(CFLAGS) $(LFLAGS) $(OBJECTS) ../../lib/darwin.a -o $(TARGET) $(LFLAGS)
+	$(CXX) $(CFLAGS) $(LFLAGS) $(OBJECTS) $(INCLUDE_DIRS) -o $(TARGET) $(LFLAGS)
 	chmod 755 $(TARGET)
 
 # useful to make a backup "make tgz"
 tgz: clean
 	mkdir -p backups
 	tar czvf ./backups/DARwIn_demo_`date +"%Y_%m_%d_%H.%M.%S"`.tgz --exclude backups *
+

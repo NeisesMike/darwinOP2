@@ -11,6 +11,6 @@ echo "" &&
 make clean &&
 make &&
 cd ../../../ &&
-rm game &&
+( rm game || true ) &&
 ln -s Linux/project/mikeProj/game . &&
 echo "done!"
