@@ -37,6 +37,9 @@ class Player
 {
     public:
 
+        // learn, in sequence, the colors of the game.
+        void learnColors();
+
         // associate each card with a location ( a 2Dpos a la gaze )
         // allow for some error plox
         void calibrateVision();

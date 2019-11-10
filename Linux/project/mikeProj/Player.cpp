@@ -170,13 +170,13 @@ void Player::changeGemColor(CM730* body, Color col )
             body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(0, 0, 255), 0);
             break;
         case ORANGE:
-            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(0, 0, 0), 0);
+            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(225, 128, 0), 0);
             break;
         case YELLOW:
-            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(255, 128, 0), 0);
+            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(128, 225, 0), 0);
             break;
         case PURPLE:
-            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(0, 0, 0), 0);
+            body->WriteWord(body->ID_CM, body->P_LED_HEAD_L, body->MakeColor(225, 0, 225), 0);
             break;
     }
     return;

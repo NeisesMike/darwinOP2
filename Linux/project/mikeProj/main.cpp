@@ -81,23 +81,23 @@ int main(void)
     // MIKE NOTE
     // Color Definitions - construction paper in daylight bulb light
 
-    ColorFinder* red_finder = new ColorFinder(340, 15, 45, 0, 0.3, 50.0);
+    ColorFinder* red_finder = new ColorFinder(355, 10, 45, 0, 0.3, 50.0);
     red_finder->LoadINISettings(ini, "RED");
     httpd::red_finder = red_finder;
 
-    ColorFinder* orange_finder = new ColorFinder(5, 15, 45, 0, 0.3, 50.0);
+    ColorFinder* orange_finder = new ColorFinder(15, 10, 45, 0, 0.3, 50.0);
     orange_finder->LoadINISettings(ini, "ORANGE");
     httpd::orange_finder = orange_finder;
 
-    ColorFinder* yellow_finder = new ColorFinder(60, 15, 45, 0, 0.3, 50.0);
+    ColorFinder* yellow_finder = new ColorFinder(45, 15, 45, 0, 0.3, 50.0);
     yellow_finder->LoadINISettings(ini, "YELLOW");
     httpd::yellow_finder = yellow_finder;
 
-    ColorFinder* green_finder = new ColorFinder(165, 15, 45, 0, 0.3, 50.0);
+    ColorFinder* green_finder = new ColorFinder(117, 15, 25, 0, 0.3, 50.0);
     green_finder->LoadINISettings(ini, "BLUE");
     httpd::green_finder = green_finder;
 
-    ColorFinder* blue_finder = new ColorFinder(215, 5, 30, 30, 0.3, 50.0);
+    ColorFinder* blue_finder = new ColorFinder(220, 15, 30, 30, 0.3, 50.0);
     blue_finder->LoadINISettings(ini, "BLUE");
     httpd::blue_finder = blue_finder;
 
@@ -309,19 +309,37 @@ int main(void)
         {
             lastDetected = RED;
             DarCon->changeGemColor( &cm730, RED );
-            festival_say_text("That's red.");
+            festival_say_text("red");
+        }
+        else if((detected_color & ORANGE) != 0 && lastDetected != ORANGE)
+        {
+            lastDetected = ORANGE;
+            DarCon->changeGemColor( &cm730, ORANGE );
+            festival_say_text("orange");
         }
         else if((detected_color & YELLOW) != 0 && lastDetected != YELLOW)
         {
             lastDetected = YELLOW;
             DarCon->changeGemColor( &cm730, YELLOW );
-            festival_say_text("I think that's yellow.");
+            festival_say_text("yellow");
+        }
+        else if((detected_color & GREEN) != 0 && lastDetected != GREEN)
+        {
+            lastDetected = GREEN;
+            DarCon->changeGemColor( &cm730, GREEN );
+            festival_say_text("green");
         }
         else if((detected_color & BLUE) != 0 && lastDetected != BLUE)
         {
             lastDetected = BLUE;
             DarCon->changeGemColor( &cm730, BLUE );
-            festival_say_text("That looks like blue.");
+            festival_say_text("blue");
+        }
+        else if((detected_color & PURPLE) != 0 && lastDetected != PURPLE)
+        {
+            lastDetected = PURPLE;
+            DarCon->changeGemColor( &cm730, PURPLE );
+            festival_say_text("purple");
         }
 
     }
