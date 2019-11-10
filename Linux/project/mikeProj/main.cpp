@@ -81,27 +81,27 @@ int main(void)
     // MIKE NOTE
     // Color Definitions - construction paper in daylight bulb light
 
-    ColorFinder* red_finder = new ColorFinder(355, 10, 45, 0, 0.3, 50.0);
+    ColorFinder* red_finder = new ColorFinder(355, 10, 45, 0, 24, 50.0);
     red_finder->LoadINISettings(ini, "RED");
     httpd::red_finder = red_finder;
 
-    ColorFinder* orange_finder = new ColorFinder(15, 10, 45, 0, 0.3, 50.0);
+    ColorFinder* orange_finder = new ColorFinder(15, 10, 45, 0, 24, 50.0);
     orange_finder->LoadINISettings(ini, "ORANGE");
     httpd::orange_finder = orange_finder;
 
-    ColorFinder* yellow_finder = new ColorFinder(45, 15, 45, 0, 0.3, 50.0);
+    ColorFinder* yellow_finder = new ColorFinder(45, 15, 45, 0, 24, 50.0);
     yellow_finder->LoadINISettings(ini, "YELLOW");
     httpd::yellow_finder = yellow_finder;
 
-    ColorFinder* green_finder = new ColorFinder(117, 15, 25, 0, 0.3, 50.0);
+    ColorFinder* green_finder = new ColorFinder(117, 15, 25, 0, 24, 50.0);
     green_finder->LoadINISettings(ini, "BLUE");
     httpd::green_finder = green_finder;
 
-    ColorFinder* blue_finder = new ColorFinder(220, 15, 30, 30, 0.3, 50.0);
+    ColorFinder* blue_finder = new ColorFinder(220, 15, 30, 30, 24, 50.0);
     blue_finder->LoadINISettings(ini, "BLUE");
     httpd::blue_finder = blue_finder;
 
-    ColorFinder* purple_finder = new ColorFinder(280, 15, 20, 20, 0.3, 50.0);
+    ColorFinder* purple_finder = new ColorFinder(280, 15, 20, 20, 24, 50.0);
     purple_finder->LoadINISettings(ini, "PURPLE");
     httpd::purple_finder = purple_finder;
 
