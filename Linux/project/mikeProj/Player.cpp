@@ -12,6 +12,22 @@ Player::Player()
         boardMemory[i] = UNKNOWN;
     }
 }
+/*
+struct ColorMem
+{
+   int red;
+   int orange;
+   int yellow;
+   int green;
+   int blue;
+   int purple;
+};
+*/
+
+void Player::learnColors()
+{
+    return;
+}
 
 // TODO
 void Player::calibrateVision()

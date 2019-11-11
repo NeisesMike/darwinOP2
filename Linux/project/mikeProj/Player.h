@@ -33,6 +33,16 @@ enum Color
     PURPLE = 64
 };
 
+struct ColorMem
+{
+   int red;
+   int orange;
+   int yellow;
+   int green;
+   int blue;
+   int purple;
+};
+
 class Player
 {
     public:
