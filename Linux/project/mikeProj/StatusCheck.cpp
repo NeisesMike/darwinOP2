@@ -62,12 +62,10 @@ void StatusCheck::Check(CM730 &cm730)
         if(m_cur_mode == NO_MOOD)
         {
             cm730.WriteByte(CM730::P_LED_PANNEL, 0x01, NULL);
-            LinuxActionScript::PlayMP3("../../../Data/mp3/Autonomous soccer mode.mp3");
         }
         else if(m_cur_mode == YES_MOOD)
         {
             cm730.WriteByte(CM730::P_LED_PANNEL, 0x02, NULL);
-            LinuxActionScript::PlayMP3("../../../Data/mp3/Interactive motion mode.mp3");
         }
     }
 
