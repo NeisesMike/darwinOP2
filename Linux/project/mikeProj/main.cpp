@@ -21,6 +21,7 @@
 #define U2D_DEV_NAME0       "/dev/ttyUSB0"
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
+/*
 void change_current_dir()
 {
     char exepath[1024] = {0};
@@ -35,6 +36,7 @@ void sighandler(int sig)
 {
     exit(0);
 }
+*/
 
 int main(void)
 {
@@ -59,139 +61,17 @@ int main(void)
     // Say some text;
     festival_say_text("hello world");
 
-    LinuxCM730 linux_cm730("/dev/ttyUSB0");
-    CM730 cm730(&linux_cm730);
-
-    signal(SIGABRT, &sighandler);
-    signal(SIGTERM, &sighandler);
-    signal(SIGQUIT, &sighandler);
-    signal(SIGINT, &sighandler);
-
-    change_current_dir();
-
-    minIni* ini = new minIni(INI_FILE_PATH);
-    Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
-
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(ini);                   // load from ini
-
-    mjpg_streamer* streamer = new mjpg_streamer(Camera::WIDTH, Camera::HEIGHT);
-
-    // MIKE NOTE
-    // Color Definitions - construction paper in daylight bulb light
-
-    ColorFinder* red_finder = new ColorFinder(355, 10, 45, 0, 24, 50.0);
-    red_finder->LoadINISettings(ini, "RED");
-    httpd::red_finder = red_finder;
-
-    ColorFinder* orange_finder = new ColorFinder(15, 10, 45, 0, 24, 50.0);
-    orange_finder->LoadINISettings(ini, "ORANGE");
-    httpd::orange_finder = orange_finder;
-
-    ColorFinder* yellow_finder = new ColorFinder(45, 15, 45, 0, 24, 50.0);
-    yellow_finder->LoadINISettings(ini, "YELLOW");
-    httpd::yellow_finder = yellow_finder;
-
-    ColorFinder* green_finder = new ColorFinder(117, 15, 25, 0, 24, 50.0);
-    green_finder->LoadINISettings(ini, "BLUE");
-    httpd::green_finder = green_finder;
-
-    ColorFinder* blue_finder = new ColorFinder(220, 15, 30, 30, 24, 50.0);
-    blue_finder->LoadINISettings(ini, "BLUE");
-    httpd::blue_finder = blue_finder;
-
-    ColorFinder* purple_finder = new ColorFinder(280, 15, 20, 20, 24, 50.0);
-    purple_finder->LoadINISettings(ini, "PURPLE");
-    httpd::purple_finder = purple_finder;
-
-    /* UNUSED COLORS
-
-       ColorFinder* pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
-       pink_finder->LoadINISettings(ini, "PINK");
-       httpd::pink_finder = pink_finder;
-
-       ColorFinder* brown_finder = new ColorFinder(10, 20, 9, 0, 0.3, 50.0);
-       brown_finder->LoadINISettings(ini, "BROWN");
-       httpd::brown_finder = brown_finder;
-
-       ColorFinder* white_finder = new ColorFinder(205, 10, 0, 70, 0.3, 50.0);
-       white_finder->LoadINISettings(ini, "WHITE");
-       httpd::white_finder = white_finder;
-
-    // black needs to be at Exposure = 75
-    ColorFinder* black_finder = new ColorFinder(215, 10, 30, 30, 0.3, 50.0);
-    black_finder->LoadINISettings(ini, "BLACK");
-    httpd::black_finder = black_finder;
-    */
-
-    BallTracker tracker = BallTracker();
-
-    httpd::ini = ini;
-
-    //////////////////// Framework Initialize ////////////////////////////
-    if(MotionManager::GetInstance()->Initialize(&cm730) == false)
-    {
-        linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if(MotionManager::GetInstance()->Initialize(&cm730) == false)
-        {
-            printf("Fail to initialize Motion Manager!\n");
-            return(0);
-        }
-    }
-
-    MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
-    MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
-
-    LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
-    motion_timer->Start();
-    /////////////////////////////////////////////////////////////////////
-
-    MotionManager::GetInstance()->LoadINISettings(ini);
-
-    int firm_ver = 0;
-    if(cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0)  != CM730::SUCCESS)
-    {
-        fprintf(stderr, "Can't read firmware version from Dynamixel ID %d!! \n\n", JointData::ID_HEAD_PAN);
-        exit(0);
-    }
-
-    if(0 < firm_ver && firm_ver < 27)
-    {
-#ifdef MX28_1024
-        Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
-#else
-        fprintf(stderr, "MX-28's firmware is not support 4096 resolution!! \n");
-        fprintf(stderr, "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n\n");
-        exit(0);
-#endif
-    }
-    else if(27 <= firm_ver)
-    {
-#ifdef MX28_1024
-        fprintf(stderr, "MX-28's firmware is not support 1024 resolution!! \n");
-        fprintf(stderr, "Remove '#define MX28_1024' from 'MX28.h' file and rebuild.\n\n");
-        exit(0);
-#else
-        Action::GetInstance()->LoadFile((char*)MOTION_FILE_PATH);
-#endif
-    }
-    else
-        exit(0);
-
-    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
-    MotionManager::GetInstance()->SetEnable(true);
-
-    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01|0x02|0x04, NULL);
+    sleep(15);
 
     // MIKE NOTE
     // START OF PROGRAM (END OF INITS)
 
     //LinuxActionScript::PlayMP3("../../../Data/mp3/Demonstration ready mode.mp3");
-    Action::GetInstance()->Start(15);
+    //Action::GetInstance()->Start(15);
 
     Color lastDetected = UNKNOWN;
 
+    /*
     while(1)
     {
         StatusCheck::Check(cm730);
@@ -271,12 +151,10 @@ int main(void)
             //tracker.Process(blue_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
         }
 
-        /*
-        if(StatusCheck::m_is_started == 0)
-        {
-            continue;
-        }
-        */
+//        if(StatusCheck::m_is_started == 0)
+//        {
+//            continue;
+//        }
 
         // MIKE NOTE
         // CONDITIONAL ACTIONS
@@ -301,10 +179,10 @@ int main(void)
             default:
                 break;
         }
-        /*
-           if(Action::GetInstance()->IsRunning() == 0)
-           VisionMode::Play(detected_color);
-           */
+
+           //if(Action::GetInstance()->IsRunning() == 0)
+           //VisionMode::Play(detected_color);
+
         if((detected_color & RED) != 0 && lastDetected != RED)
         {
             lastDetected = RED;
@@ -343,6 +221,7 @@ int main(void)
         }
 
     }
+    */
 }
 
 

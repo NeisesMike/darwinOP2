@@ -15,10 +15,23 @@
 #include <string.h>
 #include <libgen.h>
 #include <signal.h>
+#include <unistd.h>
 
 #include "mjpg_streamer.h"
 
 #include "StatusCheck.h"
+
+#ifdef MX28_1024
+#define MOTION_FILE_PATH    "../../../Data/motion_1024.bin"
+#else
+#define MOTION_FILE_PATH    "../../../Data/motion_4096.bin"
+#endif
+
+#define INI_FILE_PATH       "config.ini"
+#define SCRIPT_FILE_PATH    "script.asc"
+
+#define U2D_DEV_NAME0       "/dev/ttyUSB0"
+#define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
 
@@ -83,6 +96,8 @@ class Player
         Player();
 
     private:
+        LinuxCM730 linux_cm730;
+        CM730 cm730;
         double kinestheticMemory[8];
         Color theirCard;
         int theirCardPos;
