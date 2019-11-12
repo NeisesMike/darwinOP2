@@ -16,9 +16,15 @@ CXXFLAGS += -O2 -DLINUX -Wall $(INCLUDE_DIRS)
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -Wall $(INCLUDE_DIRS)
 LFLAGS += -lpthread -lrt -ljpeg -lFestival -lestools -leststring /usr/lib/libestbase.a 
 
-OBJECTS = StatusCheck.o Player.o main.o
+OBJECTS = StatusCheck.o Eyes.o Player.o main.o Body.o
 
 all: $(TARGET)
+
+Eyes.o: Eyes.h Eyes.cpp darwin.a
+	$(CXX) $(CFLAGS) $(LFLAGS) $(INCLUDE_DIRS) -g -c Eyes.cpp ../../lib/darwin.a $(LFLAGS)
+
+Body.o: Body.h Body.cpp darwin.a
+	$(CXX) $(CFLAGS) $(LFLAGS) $(INCLUDE_DIRS) -g -c Body.cpp ../../lib/darwin.a $(LFLAGS)
 
 Player.o: Player.h Player.cpp darwin.a
 	$(CXX) $(CFLAGS) $(LFLAGS) $(INCLUDE_DIRS) -g -c Player.cpp ../../lib/darwin.a $(LFLAGS)

@@ -18,8 +18,9 @@
 #include <unistd.h>
 
 #include "mjpg_streamer.h"
-
-#include "StatusCheck.h"
+//#include "Body.h"
+#include "Eyes.h"
+#include "/usr/include/festival/festival.h"
 
 #ifdef MX28_1024
 #define MOTION_FILE_PATH    "../../../Data/motion_1024.bin"
@@ -34,27 +35,6 @@
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
-
-enum Color
-{
-    UNKNOWN = 1,
-    RED = 2,
-    ORANGE = 4,
-    YELLOW = 8,
-    GREEN = 16,
-    BLUE = 32,
-    PURPLE = 64
-};
-
-struct ColorMem
-{
-   int red;
-   int orange;
-   int yellow;
-   int green;
-   int blue;
-   int purple;
-};
 
 class Player
 {
@@ -91,13 +71,21 @@ class Player
 
         void makeBodyLanguage();
 
-        void changeGemColor( CM730* body, Color col );
+        void changeGemColor( Color col );
+
+        // do a look
+        void scan();
+
+        // check button status
+        void statusCheck();
 
         Player();
 
     private:
-        LinuxCM730 linux_cm730;
-        CM730 cm730;
+        //LinuxCM730 linux_cm730;
+        //CM730 cm730;
+//        Body body;
+        Eyes eyes;
         double kinestheticMemory[8];
         Color theirCard;
         int theirCardPos;
@@ -109,6 +97,9 @@ class Player
         // 2 arousal
         // 3 stance
         int mood[4];
+
+
+        Color lastDetected;
 };
 
 
