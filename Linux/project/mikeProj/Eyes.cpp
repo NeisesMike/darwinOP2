@@ -17,8 +17,6 @@ Eyes::Eyes()
 
     streamer = new mjpg_streamer(Camera::WIDTH, Camera::HEIGHT);
 
-    // MIKE NOTE
-
     red_finder = new ColorFinder(355, 10, 45, 0, 24, 50.0);
     red_finder->LoadINISettings(ini, "RED");
     httpd::red_finder = red_finder;
@@ -45,22 +43,24 @@ Eyes::Eyes()
 
     /* UNUSED COLORS
 
-       pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
-       pink_finder->LoadINISettings(ini, "PINK");
-       httpd::pink_finder = pink_finder;
+    pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
+    pink_finder->LoadINISettings(ini, "PINK");
+    httpd::pink_finder = pink_finder;
 
-       brown_finder = new ColorFinder(10, 20, 9, 0, 0.3, 50.0);
-       brown_finder->LoadINISettings(ini, "BROWN");
-       httpd::brown_finder = brown_finder;
+    brown_finder = new ColorFinder(10, 20, 9, 0, 0.3, 50.0);
+    brown_finder->LoadINISettings(ini, "BROWN");
+    httpd::brown_finder = brown_finder;
 
-       white_finder = new ColorFinder(205, 10, 0, 70, 0.3, 50.0);
-       white_finder->LoadINISettings(ini, "WHITE");
-       httpd::white_finder = white_finder;
+    white_finder = new ColorFinder(205, 10, 0, 70, 0.3, 50.0);
+    white_finder->LoadINISettings(ini, "WHITE");
+    httpd::white_finder = white_finder;
 
     // black needs to be at Exposure = 75
+
     ColorFinder* black_finder = new ColorFinder(215, 10, 30, 30, 0.3, 50.0);
     black_finder->LoadINISettings(ini, "BLACK");
     httpd::black_finder = black_finder;
+
     */
 
     tracker = new BallTracker();

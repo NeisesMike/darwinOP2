@@ -11,12 +11,12 @@ TARGET = game
 
 INCLUDE_DIRS = -I../../include -I../../../Framework/include -I/usr/share/festival/festival/src/include -I/usr/include/speech_tools/ ../../lib/darwin.a
 
-CXX = g++ 
+CXX = g++
 CXXFLAGS += -O2 -DLINUX -Wall $(INCLUDE_DIRS)
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -Wall $(INCLUDE_DIRS)
 LFLAGS += -lpthread -lrt -ljpeg -lFestival -lestools -leststring /usr/lib/libestbase.a 
 
-OBJECTS = StatusCheck.o Eyes.o Player.o main.o Body.o
+OBJECTS = StatusCheck.o Body.o Eyes.o Player.o main.o
 
 all: $(TARGET)
 

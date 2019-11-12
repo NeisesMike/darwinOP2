@@ -30,8 +30,6 @@ Body::Body() : linux_cm730(LinuxCM730("/dev/ttyUSB0")) , cm730(CM730(&linux_cm73
 
     change_current_dir();
 
-    minIni* ini = new minIni(INI_FILE_PATH);
-
     //////////////////// Framework Initialize ////////////////////////////
     if(MotionManager::GetInstance()->Initialize(&cm730) == false)
     {
@@ -46,11 +44,9 @@ Body::Body() : linux_cm730(LinuxCM730("/dev/ttyUSB0")) , cm730(CM730(&linux_cm73
     MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
 
-    LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
-    motion_timer->Start();
+    //LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
+    //motion_timer->Start();
     /////////////////////////////////////////////////////////////////////
-
-    MotionManager::GetInstance()->LoadINISettings(ini);
 
     int firm_ver = 0;
     if(cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0)  != CM730::SUCCESS)

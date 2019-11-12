@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #include "mjpg_streamer.h"
-//#include "Body.h"
+#include "Body.h"
 #include "Eyes.h"
 #include "/usr/include/festival/festival.h"
 
@@ -84,7 +84,7 @@ class Player
     private:
         //LinuxCM730 linux_cm730;
         //CM730 cm730;
-//        Body body;
+        Body body;
         Eyes eyes;
         double kinestheticMemory[8];
         Color theirCard;

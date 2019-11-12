@@ -6,7 +6,7 @@
 
 #include "Player.h"
 
-Player::Player() : eyes(Eyes())//, body(Body())//, linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm730(CM730(&linux_cm730)) 
+Player::Player() : eyes(Eyes()), body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm730(CM730(&linux_cm730)) 
 {
     for(int i=0; i<8; i++)
     {
@@ -33,72 +33,7 @@ Player::Player() : eyes(Eyes())//, body(Body())//, linux_cm730(LinuxCM730("/dev/
     // Say some text;
     festival_say_text("hello world");
 
-    /*
-       signal(SIGABRT, &sighandler);
-       signal(SIGTERM, &sighandler);
-       signal(SIGQUIT, &sighandler);
-       signal(SIGINT, &sighandler);
-
-       change_current_dir();
-
-       minIni* ini = new minIni(INI_FILE_PATH);
-
-    //////////////////// Framework Initialize ////////////////////////////
-    if(MotionManager::GetInstance()->Initialize(&cm730) == false)
-    {
-    linux_cm730.SetPortName(U2D_DEV_NAME1);
-    if(MotionManager::GetInstance()->Initialize(&cm730) == false)
-    {
-    printf("Fail to initialize Motion Manager!\n");
-    exit(0);
-    }
-    }
-
-    MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
-    MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
-
-    LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
-    motion_timer->Start();
-    /////////////////////////////////////////////////////////////////////
-
-    MotionManager::GetInstance()->LoadINISettings(ini);
-
-    int firm_ver = 0;
-    if(cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0)  != CM730::SUCCESS)
-    {
-    fprintf(stderr, "Can't read firmware version from Dynamixel ID %d!! \n\n", JointData::ID_HEAD_PAN);
-    exit(0);
-    }
-
-    if(0 < firm_ver && firm_ver < 27)
-    {
-#ifdef MX28_1024
-Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
-#else
-fprintf(stderr, "MX-28's firmware is not support 4096 resolution!! \n");
-fprintf(stderr, "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n\n");
-exit(0);
-#endif
 }
-else if(27 <= firm_ver)
-{
-#ifdef MX28_1024
-fprintf(stderr, "MX-28's firmware is not support 1024 resolution!! \n");
-fprintf(stderr, "Remove '#define MX28_1024' from 'MX28.h' file and rebuild.\n\n");
-exit(0);
-#else
-Action::GetInstance()->LoadFile((char*)MOTION_FILE_PATH);
-#endif
-}
-else
-exit(0);
-
-Action::GetInstance()->m_Joint.SetEnable//body(true, true);
-MotionManager::GetInstance()->SetEnable(true);
-
-cm730.WriteByte(CM730::P_LED_PANNEL, 0x01|0x02|0x04, NULL);
-*/
-    }
 
 void Player::learnColors()
 {
@@ -250,7 +185,7 @@ void Player::makeBodyLanguage()
 
 void Player::changeGemColor( Color col )
 {
-    //body.changeGemColor( col );
+    body.changeGemColor( col );
 }
 
 void Player::scan()
@@ -259,43 +194,43 @@ void Player::scan()
     if((detected_color & RED) != 0 && lastDetected != RED)
     {
         lastDetected = RED;
-        //body.changeGemColor( RED );
+        body.changeGemColor( RED );
         festival_say_text("red");
     }
     else if((detected_color & ORANGE) != 0 &lastDetected != ORANGE)
     {
         lastDetected = ORANGE;
-        //body.changeGemColor( ORANGE );
+        body.changeGemColor( ORANGE );
         festival_say_text("orange");
     }
     else if((detected_color & YELLOW) != 0 &lastDetected != YELLOW)
     {
         lastDetected = YELLOW;
-        //body.changeGemColor( YELLOW );
+        body.changeGemColor( YELLOW );
         festival_say_text("yellow");
     }
     else if((detected_color & GREEN) != 0 &lastDetected != GREEN)
     {
         lastDetected = GREEN;
-        //body.changeGemColor( GREEN );
+        body.changeGemColor( GREEN );
         festival_say_text("green");
     }
     else if((detected_color & BLUE) != 0 &lastDetected != BLUE)
     {
         lastDetected = BLUE;
-        //body.changeGemColor( BLUE );
+        body.changeGemColor( BLUE );
         festival_say_text("blue");
     }
     else if((detected_color & PURPLE) != 0 &lastDetected != PURPLE)
     {
         lastDetected = PURPLE;
-        //body.changeGemColor( PURPLE );
+        body.changeGemColor( PURPLE );
         festival_say_text("purple");
     }
 }
 
 void Player::statusCheck()
 {
-    //body.statusCheck();
+    body.statusCheck();
     return;
 }
