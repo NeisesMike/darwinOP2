@@ -1,8 +1,8 @@
 /*
-* Michael Neises
-* 12 november 2019
-* BODY header
-*/
+ * Michael Neises
+ * 12 november 2019
+ * BODY header
+ */
 
 #ifndef BODY_H
 #define BODY_H
@@ -48,6 +48,12 @@ class Body
         void statusCheck();
 
         void moveHead(Point2D pos);
+
+        void moveHead(int pan, int tilt);
+
+        int readHeadPan();
+
+        int readHeadTilt();
 
         Eyes eyes;
         Body();
