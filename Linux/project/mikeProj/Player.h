@@ -81,6 +81,9 @@ class Player
 
         void changeGemColor( Color col );
 
+        // say hello
+        void greet();
+
         // do a look
         void scan();
 

@@ -160,11 +160,11 @@ void Eyes::learnRed(int hue, bool isLearning)
     minIni* ini = new minIni(INI_FILE_PATH);
     if( isLearning )
     {
-        red_finder = new ColorFinder(hue, 15, 45, 0, 30, 80);
+        red_finder = new ColorFinder(hue, 10, 45, 0, 30, 80);
     }
     else
     {
-        red_finder = new ColorFinder(hue, 5, 45, 0, 5, 15);
+        red_finder = new ColorFinder(hue, 20, 45, 0, 5, 15);
     }
     httpd::red_finder = red_finder;
 }
@@ -202,11 +202,11 @@ void Eyes::learnGreen(int hue, bool isLearning)
     minIni* ini = new minIni(INI_FILE_PATH);
     if( isLearning )
     {
-        green_finder = new ColorFinder(hue, 15, 20, 0, 30, 80);
+        green_finder = new ColorFinder(hue, 10, 20, 0, 30, 80);
     }
     else
     {
-        green_finder = new ColorFinder(hue, 15, 20, 0, 5, 15);
+        green_finder = new ColorFinder(hue, 20, 20, 0, 5, 15);
     }
     httpd::green_finder = green_finder;
 }
@@ -216,11 +216,11 @@ void Eyes::learnBlue(int hue, bool isLearning)
     minIni* ini = new minIni(INI_FILE_PATH);
     if( isLearning )
     {
-        blue_finder = new ColorFinder(hue, 15, 30, 30, 30, 80);
+        blue_finder = new ColorFinder(hue, 10, 30, 30, 30, 80);
     }
     else
     {
-        blue_finder = new ColorFinder(hue, 10, 30, 30, 5, 15);
+        blue_finder = new ColorFinder(hue, 20, 30, 30, 5, 15);
     }
     httpd::blue_finder = blue_finder;
 }

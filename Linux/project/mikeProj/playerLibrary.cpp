@@ -16,8 +16,8 @@ void Player::learnRed()
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 310;
-    int startTop = 10;
+    int startBottom = 330;
+    int startTop = 30;
 
     // this will be the chosen value for the indicated REDor
     // also a couple helpers
@@ -220,8 +220,8 @@ void Player::learnGreen()
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 65;
-    int startTop = 135;
+    int startBottom = 121;
+    int startTop = 181;
 
     // this will be the chosen value for the indicated GREENor
     // also a couple helpers
@@ -288,8 +288,8 @@ void Player::learnBlue()
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 185;
-    int startTop = 245;
+    int startBottom = 194;
+    int startTop = 254;
 
     // this will be the chosen value for the indicated BLUEor
     // also a couple helpers

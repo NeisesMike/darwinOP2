@@ -26,38 +26,35 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
     // festival will crash, and anything we want to say
     // will be lost if it's queued after the current output
     festival_wait_for_spooler();
-
-    // Say simple file
-    //festival_say_file("/etc/motd");
-
-    //festival_eval_command("(voice_ked_diphone)");
-    // Say some text;
-    festival_say_text("hello world");
 }
 
 void Player::learnColors()
 {
-    Point2D down = Point2D(180.0,20.0);
+    Point2D up = Point2D(180.0, 150.0);
+    Point2D down = Point2D(180.0,227.0);
 
-    body.moveHead(down);
+    body.moveHead(up);
     festival_say_text("I need you to help me learn my colors.");
+
     printf( "\nred\n" );
     learnRed();
-    body.moveHead(down);
+    /*
     printf( "\norange\n" );
     learnOrange();
-    body.moveHead(down);
     printf( "\nyellow\n" );
     learnYellow();
-    body.moveHead(down);
+    */
     printf( "\ngreen\n" );
     learnGreen();
-    body.moveHead(down);
     printf( "\nblue\n" );
     learnBlue();
-    body.moveHead(down);
+    /*
     printf( "\npurple\n" );
     learnPurple();
+    */
+
+    festival_say_text("Okay, I'm ready to identify those colors.");
+    body.moveHead(down);
     return;
 }
 
@@ -253,5 +250,13 @@ void Player::scan()
 void Player::statusCheck()
 {
     body.statusCheck();
+    return;
+}
+
+void Player::greet()
+{
+    Point2D up = Point2D(180.0, 150.0);
+    body.moveHead(up);
+    festival_say_text("Hello, my name is Darwin.");
     return;
 }

@@ -42,7 +42,8 @@ int main(void)
     // init the player
     Player* DarCon = new Player();
 
-    DarCon->changeGemColor( RED );
+    DarCon->greet();
+    DarCon->changeGemColor( BLUE );
     DarCon->statusCheck();
     DarCon->learnColors();
 
