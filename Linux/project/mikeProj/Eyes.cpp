@@ -17,43 +17,43 @@ Eyes::Eyes()
 
     streamer = new mjpg_streamer(Camera::WIDTH, Camera::HEIGHT);
 
-    red_finder = new ColorFinder(355, 10, 45, 0, 24, 50.0);
+    red_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     red_finder->LoadINISettings(ini, "RED");
     httpd::red_finder = red_finder;
 
-    orange_finder = new ColorFinder(15, 10, 45, 0, 24, 50.0);
+    orange_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     orange_finder->LoadINISettings(ini, "ORANGE");
     httpd::orange_finder = orange_finder;
 
-    yellow_finder = new ColorFinder(45, 15, 45, 0, 24, 50.0);
+    yellow_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     yellow_finder->LoadINISettings(ini, "YELLOW");
     httpd::yellow_finder = yellow_finder;
 
-    green_finder = new ColorFinder(117, 15, 25, 0, 24, 50.0);
-    green_finder->LoadINISettings(ini, "BLUE");
+    green_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
+    green_finder->LoadINISettings(ini, "GREEN");
     httpd::green_finder = green_finder;
 
-    blue_finder = new ColorFinder(220, 15, 30, 30, 24, 50.0);
+    blue_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     blue_finder->LoadINISettings(ini, "BLUE");
     httpd::blue_finder = blue_finder;
 
-    purple_finder = new ColorFinder(280, 15, 20, 20, 24, 50.0);
+    purple_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     purple_finder->LoadINISettings(ini, "PURPLE");
     httpd::purple_finder = purple_finder;
 
     /* UNUSED COLORS
 
-    pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
-    pink_finder->LoadINISettings(ini, "PINK");
-    httpd::pink_finder = pink_finder;
+       pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
+       pink_finder->LoadINISettings(ini, "PINK");
+       httpd::pink_finder = pink_finder;
 
-    brown_finder = new ColorFinder(10, 20, 9, 0, 0.3, 50.0);
-    brown_finder->LoadINISettings(ini, "BROWN");
-    httpd::brown_finder = brown_finder;
+       brown_finder = new ColorFinder(10, 20, 9, 0, 0.3, 50.0);
+       brown_finder->LoadINISettings(ini, "BROWN");
+       httpd::brown_finder = brown_finder;
 
-    white_finder = new ColorFinder(205, 10, 0, 70, 0.3, 50.0);
-    white_finder->LoadINISettings(ini, "WHITE");
-    httpd::white_finder = white_finder;
+       white_finder = new ColorFinder(205, 10, 0, 70, 0.3, 50.0);
+       white_finder->LoadINISettings(ini, "WHITE");
+       httpd::white_finder = white_finder;
 
     // black needs to be at Exposure = 75
 
@@ -61,11 +61,19 @@ Eyes::Eyes()
     black_finder->LoadINISettings(ini, "BLACK");
     httpd::black_finder = black_finder;
 
-    */
-
-    tracker = new BallTracker();
+*/
 
     httpd::ini = ini;
+}
+
+bool Eyes::tryHit( Color col )
+{
+    int detected_color = look();
+    if( detected_color == col )
+    {
+        return( true );
+    }
+    return( false );
 }
 
 int Eyes::look()
@@ -144,5 +152,90 @@ int Eyes::look()
     detected_color |= (purple_pos.X == -1)? 0 : PURPLE;
 
     return( detected_color );
+}
+
+
+void Eyes::learnRed(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        red_finder = new ColorFinder(hue, 15, 45, 0, 30, 80);
+    }
+    else
+    {
+        red_finder = new ColorFinder(hue, 5, 45, 0, 5, 15);
+    }
+    httpd::red_finder = red_finder;
+}
+
+void Eyes::learnOrange(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        orange_finder = new ColorFinder(hue, 15, 35, 0, 20, 80);
+    }
+    else
+    {
+        orange_finder = new ColorFinder(hue, 5, 35, 0, 5, 15);
+    }
+    httpd::orange_finder = orange_finder;
+}
+
+void Eyes::learnYellow(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        yellow_finder = new ColorFinder(hue, 15, 65, 50, 30, 80);
+    }
+    else
+    {
+        yellow_finder = new ColorFinder(hue, 5, 65, 50, 5, 15);
+    }
+    httpd::yellow_finder = yellow_finder;
+}
+
+void Eyes::learnGreen(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        green_finder = new ColorFinder(hue, 15, 20, 0, 30, 80);
+    }
+    else
+    {
+        green_finder = new ColorFinder(hue, 15, 20, 0, 5, 15);
+    }
+    httpd::green_finder = green_finder;
+}
+
+void Eyes::learnBlue(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        blue_finder = new ColorFinder(hue, 15, 30, 30, 30, 80);
+    }
+    else
+    {
+        blue_finder = new ColorFinder(hue, 10, 30, 30, 5, 15);
+    }
+    httpd::blue_finder = blue_finder;
+}
+
+void Eyes::learnPurple(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 80);
+    }
+    else
+    {
+        purple_finder = new ColorFinder(hue, 40, 20, 20, 5, 15);
+    }
+    httpd::purple_finder = purple_finder;
 }
 

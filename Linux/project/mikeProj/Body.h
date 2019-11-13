@@ -19,6 +19,7 @@
 
 #include "StatusCheck.h"
 #include "knowledge.h"
+#include "Eyes.h"
 
 #ifdef MX28_1024
 #define MOTION_FILE_PATH    "../../../Data/motion_1024.bin"
@@ -46,11 +47,15 @@ class Body
 
         void statusCheck();
 
+        void moveHead(Point2D pos);
+
+        Eyes eyes;
         Body();
 
     private:
         LinuxCM730 linux_cm730;
         CM730 cm730;
+        BallTracker tracker;
 };
 
 #endif

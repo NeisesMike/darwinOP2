@@ -154,6 +154,7 @@ Point2D& ColorFinder::GetPosition(Image* hsv_img)
     }
     else
     {
+        //printf( "I found percent to be %f\n", ((double)count)/hsv_img->m_NumberOfPixels );
         m_center_point.X = (int)((double)sum_x / (double)count);
         m_center_point.Y = (int)((double)sum_y / (double)count);
     }

@@ -5,8 +5,9 @@
  */
 
 #include "Player.h"
+#include "playerLibrary.cpp"
 
-Player::Player() : eyes(Eyes()), body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm730(CM730(&linux_cm730)) 
+Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm730(CM730(&linux_cm730)) 
 {
     for(int i=0; i<8; i++)
     {
@@ -32,11 +33,31 @@ Player::Player() : eyes(Eyes()), body(Body())// , linux_cm730(LinuxCM730("/dev/t
     //festival_eval_command("(voice_ked_diphone)");
     // Say some text;
     festival_say_text("hello world");
-
 }
 
 void Player::learnColors()
 {
+    Point2D down = Point2D(180.0,20.0);
+
+    body.moveHead(down);
+    festival_say_text("I need you to help me learn my colors.");
+    printf( "\nred\n" );
+    learnRed();
+    body.moveHead(down);
+    printf( "\norange\n" );
+    learnOrange();
+    body.moveHead(down);
+    printf( "\nyellow\n" );
+    learnYellow();
+    body.moveHead(down);
+    printf( "\ngreen\n" );
+    learnGreen();
+    body.moveHead(down);
+    printf( "\nblue\n" );
+    learnBlue();
+    body.moveHead(down);
+    printf( "\npurple\n" );
+    learnPurple();
     return;
 }
 
@@ -190,7 +211,7 @@ void Player::changeGemColor( Color col )
 
 void Player::scan()
 {
-    int detected_color = eyes.look();
+    int detected_color = body.eyes.look();
     if((detected_color & RED) != 0 && lastDetected != RED)
     {
         lastDetected = RED;

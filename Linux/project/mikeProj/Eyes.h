@@ -38,8 +38,18 @@ class Eyes
 {
     public:
 
+        bool tryHit( Color col );
+
         // learn, in sequence, the colors of the game.
         void learnColors();
+
+        // give a hue integer, reset the related color_finder
+        void learnRed(int hue, bool isLearning);
+        void learnOrange(int hue, bool isLearning);
+        void learnYellow(int hue, bool isLearning);
+        void learnGreen(int hue, bool isLearning);
+        void learnBlue(int hue, bool isLearning);
+        void learnPurple(int hue, bool isLearning);
 
         // do a look
         // return the detected color
@@ -54,7 +64,6 @@ class Eyes
         ColorFinder* green_finder; 
         ColorFinder* blue_finder;
         ColorFinder* purple_finder;
-        BallTracker* tracker;
         mjpg_streamer* streamer;
 };
 

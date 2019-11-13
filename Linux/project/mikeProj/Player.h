@@ -40,6 +40,14 @@ class Player
 {
     public:
 
+        // learn one color
+        void learnRed();
+        void learnOrange();
+        void learnYellow();
+        void learnGreen();
+        void learnBlue();
+        void learnPurple();
+
         // learn, in sequence, the colors of the game.
         void learnColors();
 
@@ -85,7 +93,7 @@ class Player
         //LinuxCM730 linux_cm730;
         //CM730 cm730;
         Body body;
-        Eyes eyes;
+        //Eyes eyes;
         double kinestheticMemory[8];
         Color theirCard;
         int theirCardPos;
