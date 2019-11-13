@@ -53,6 +53,7 @@ void Player::learnColors()
     learnPurple();
     */
 
+    body.moveHead(up);
     festival_say_text("Okay, I'm ready to identify those colors.");
     body.moveHead(down);
     return;

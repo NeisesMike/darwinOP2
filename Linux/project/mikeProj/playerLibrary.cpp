@@ -1,4 +1,3 @@
-
 int getMid(int bot, int top)
 {
     if( bot < top )
@@ -11,8 +10,7 @@ int getMid(int bot, int top)
 void Player::learnRed()
 {
     festival_say_text("Please show me RED.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -79,8 +77,7 @@ void Player::learnRed()
 void Player::learnOrange()
 {
     festival_say_text("Please show me Orange.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -147,8 +144,7 @@ void Player::learnOrange()
 void Player::learnYellow()
 {
     festival_say_text("Please show me Yellow.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -215,8 +211,7 @@ void Player::learnYellow()
 void Player::learnGreen()
 {
     festival_say_text("Please show me Green.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -283,8 +278,7 @@ void Player::learnGreen()
 void Player::learnBlue()
 {
     festival_say_text("Please show me Blue.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -351,8 +345,7 @@ void Player::learnBlue()
 void Player::learnPurple()
 {
     festival_say_text("Please show me Purple.");
-    Point2D myPoint = Point2D(180.0,227.0);
-    body.moveHead(myPoint);
+    body.moveHead( 0, -20 );
     sleep(5);
 
     // these are meant to be upper and lower bounds for what the hue might be
