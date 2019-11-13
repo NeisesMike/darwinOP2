@@ -9,5 +9,8 @@ echo "cleaning project..." &&
 echo "" &&
 make clean &&
 cd ../../../ &&
-rm game &&
+(
+    rm game ||
+    echo "skipping delete"
+)
 echo "done!"
