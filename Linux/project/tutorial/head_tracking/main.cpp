@@ -69,10 +69,14 @@ int main(void)
 
     while(1)
     {
-        Point2D pos;
         LinuxCamera::GetInstance()->CaptureFrame();	
+        Point2D pos = ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
+        if( pos.X != -1 )
+        {
+            printf( "Point is X: %f, Y: %f\n", pos.X, pos.Y );
+        }
 
-        tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
+        tracker.Process(pos);
 
 		rgb_ball = LinuxCamera::GetInstance()->fbuffer->m_RGBFrame;
         for(int i = 0; i < rgb_ball->m_NumberOfPixels; i++)
