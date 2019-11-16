@@ -45,8 +45,9 @@ void ColorFinder::Filtering(Image *img)
     unsigned int h, s, v;
     int h_max, h_min;
 
-    if(m_result == NULL)
-        m_result = new Image(img->m_Width, img->m_Height, 1);
+    //if(m_result == NULL)
+    delete( m_result );
+    m_result = new Image(img->m_Width, img->m_Height, 1);
 
     h_max = m_hue + m_hue_tolerance;
     h_min = m_hue - m_hue_tolerance;
@@ -161,3 +162,4 @@ Point2D& ColorFinder::GetPosition(Image* hsv_img)
 
     return m_center_point;
 }
+
