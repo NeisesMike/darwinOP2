@@ -6,6 +6,7 @@
 
 #include "Player.h"
 #include "playerLibrary.cpp"
+#include <pthread.h>
 
 Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm730(CM730(&linux_cm730)) 
 {
@@ -17,7 +18,7 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
     lastDetected = UNKNOWN;
 
     // init the voice
-    int heap_size = 310000;  // default scheme heap size
+    int heap_size = 21000000;  // default scheme heap size
     int load_init_files = 1; // we want the festival init files loaded
 
     festival_initialize(load_init_files,heap_size);
@@ -30,11 +31,8 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 
 void Player::learnColors()
 {
-    Point2D up = Point2D(180.0, 150.0);
-    Point2D down = Point2D(180.0,227.0);
-
-    body.moveHead(up);
-    festival_say_text("I need you to help me learn my colors.");
+    body.moveHead(180, 40);
+    say("I need you to help me learn my colors.");
 
     printf( "\nred\n" );
     learnRed();
@@ -53,9 +51,9 @@ void Player::learnColors()
     learnPurple();
     */
 
-    body.moveHead(up);
-    festival_say_text("Okay, I'm ready to identify those colors.");
-    body.moveHead(down);
+    body.moveHead(180, 40);
+    say("Okay, I'm ready to identify those colors.");
+    body.moveHead(0, -20);
     return;
 }
 
@@ -190,9 +188,9 @@ bool Player::waitForPartner()
     return( false );
 }
 
-// TODO
-void Player::makeUtterance()
+void Player::say(const EST_String str)
 {
+    festival_say_text( str );
     return;
 }
 
@@ -207,45 +205,57 @@ void Player::changeGemColor( Color col )
     body.changeGemColor( col );
 }
 
-void Player::scan()
+void Player::interpretColor( int col )
 {
-    int detected_color = body.eyes.look();
-    if((detected_color & RED) != 0 && lastDetected != RED)
+    if((col & RED) != 0 && lastDetected != RED)
     {
         lastDetected = RED;
         body.changeGemColor( RED );
         festival_say_text("red");
     }
-    else if((detected_color & ORANGE) != 0 &lastDetected != ORANGE)
+    else if((col & ORANGE) != 0 &lastDetected != ORANGE)
     {
         lastDetected = ORANGE;
         body.changeGemColor( ORANGE );
         festival_say_text("orange");
     }
-    else if((detected_color & YELLOW) != 0 &lastDetected != YELLOW)
+    else if((col & YELLOW) != 0 &lastDetected != YELLOW)
     {
         lastDetected = YELLOW;
         body.changeGemColor( YELLOW );
         festival_say_text("yellow");
     }
-    else if((detected_color & GREEN) != 0 &lastDetected != GREEN)
+    else if((col & GREEN) != 0 &lastDetected != GREEN)
     {
         lastDetected = GREEN;
         body.changeGemColor( GREEN );
         festival_say_text("green");
     }
-    else if((detected_color & BLUE) != 0 &lastDetected != BLUE)
+    else if((col & BLUE) != 0 &lastDetected != BLUE)
     {
         lastDetected = BLUE;
         body.changeGemColor( BLUE );
         festival_say_text("blue");
     }
-    else if((detected_color & PURPLE) != 0 &lastDetected != PURPLE)
+    else if((col & PURPLE) != 0 &lastDetected != PURPLE)
     {
         lastDetected = PURPLE;
         body.changeGemColor( PURPLE );
         festival_say_text("purple");
     }
+    return;
+}
+
+void Player::observe()
+{
+    interpretColor(body.eyes.look());
+    return;
+}
+
+void Player::scan()
+{
+    interpretColor(body.eyes.maculaLook());
+    return;
 }
 
 void Player::statusCheck()
@@ -258,6 +268,6 @@ void Player::greet()
 {
     Point2D up = Point2D(180.0, 150.0);
     body.moveHead(up);
-    festival_say_text("Hello, my name is Darwin.");
+    say("Hello, my name is Darwin.");
     return;
 }

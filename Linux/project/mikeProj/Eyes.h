@@ -38,6 +38,9 @@ class Eyes
 {
     public:
 
+        Eyes();
+        ~Eyes();
+
         bool tryHit( Color col );
 
         // learn, in sequence, the colors of the game.
@@ -55,7 +58,8 @@ class Eyes
         // return the detected color
         int look();
 
-        Eyes();
+        // like look but only includes the central X% of the image
+        int maculaLook();
 
     private:
         ColorFinder* red_finder;

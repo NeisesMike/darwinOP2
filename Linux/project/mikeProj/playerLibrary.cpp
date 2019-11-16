@@ -9,7 +9,7 @@ int getMid(int bot, int top)
 
 void Player::learnRed()
 {
-    festival_say_text("Please show me RED.");
+    say("Please show me RED.");
     body.moveHead( 0, -20 );
     sleep(5);
 
@@ -76,7 +76,7 @@ void Player::learnRed()
 
 void Player::learnOrange()
 {
-    festival_say_text("Please show me Orange.");
+    say("Please show me Orange.");
     body.moveHead( 0, -20 );
     sleep(5);
 
@@ -143,7 +143,7 @@ void Player::learnOrange()
 
 void Player::learnYellow()
 {
-    festival_say_text("Please show me Yellow.");
+    say("Please show me Yellow.");
     body.moveHead( 0, -20 );
     sleep(5);
 
@@ -210,7 +210,7 @@ void Player::learnYellow()
 
 void Player::learnGreen()
 {
-    festival_say_text("Please show me Green.");
+    say("Please show me Green.");
     body.moveHead( 0, -20 );
     sleep(5);
 
@@ -277,7 +277,7 @@ void Player::learnGreen()
 
 void Player::learnBlue()
 {
-    festival_say_text("Please show me Blue.");
+    say("Please show me Blue.");
     body.moveHead( 0, -20 );
     sleep(5);
 
@@ -344,7 +344,7 @@ void Player::learnBlue()
 
 void Player::learnPurple()
 {
-    festival_say_text("Please show me Purple.");
+    say("Please show me Purple.");
     body.moveHead( 0, -20 );
     sleep(5);
 

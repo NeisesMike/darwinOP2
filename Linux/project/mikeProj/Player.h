@@ -75,7 +75,7 @@ class Player
         // return true if the card upturned was new 
         bool waitForPartner();
 
-        void makeUtterance();
+        void say(const EST_String str);
 
         void makeBodyLanguage();
 
@@ -84,9 +84,14 @@ class Player
         // say hello
         void greet();
 
-        // do a look
-        void scan();
+        void interpretColor( int col );
 
+        // do a look
+        void observe();
+
+        // scan the board
+        void scan();
+        
         // check button status
         void statusCheck();
 
