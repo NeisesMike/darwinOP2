@@ -45,6 +45,7 @@ int main(void)
     LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
     motion_timer->Start();
 
+    /*
 	MotionStatus::m_CurrentJoints.SetEnableBodyWithoutHead(false);
 	MotionStatus::m_CurrentJoints.SetEnableHeadOnly(true);
 	MotionManager::GetInstance()->SetEnable(true);
@@ -55,7 +56,7 @@ int main(void)
     cm730.WriteWord(JointData::ID_HEAD_PAN, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(0), 0);
     cm730.WriteWord(JointData::ID_HEAD_TILT, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(-20), 0);
     sleep(1);
-	MotionManager::GetInstance()->SetEnable(true);
+    */
 
     while(1)
     {
