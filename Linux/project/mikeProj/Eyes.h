@@ -34,6 +34,15 @@ struct ColorMem
    int purple;
 };
 
+struct ScanData
+{
+    int tilt;
+    int pan;
+    Point2D location;
+    Color color;
+    Point2D maculaOrigin;
+};
+
 class Eyes
 {
     public:
@@ -56,12 +65,16 @@ class Eyes
 
         // do a look
         // return the detected color
-        int look();
+        ScanData look();
 
         // like look but only includes the central 10% of the image
-        int maculaLook(double percent);
+        ScanData maculaLook(double percent);
         // only includes the designated 10% of the image
-        int maculaLook(int row, int column, double percent);
+        ScanData maculaLook(int row, int column, double percent);
+
+        // partition and analyze the image
+        // return a list of midpoints
+        void partitionScan(double percent, int tilt, int pan, ScanData* retList);
 
     private:
         ColorFinder* red_finder;

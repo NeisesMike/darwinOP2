@@ -78,7 +78,7 @@ Eyes::~Eyes()
 }
 bool Eyes::tryHit( Color col )
 {
-    int detected_color = look();
+    int detected_color = look().color;
     if( detected_color == col )
     {
         return( true );
@@ -86,7 +86,7 @@ bool Eyes::tryHit( Color col )
     return( false );
 }
 
-int Eyes::look()
+ScanData Eyes::look()
 {
     Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
 
@@ -161,7 +161,133 @@ int Eyes::look()
     detected_color |= (blue_pos.X == -1)? 0 : BLUE;
     detected_color |= (purple_pos.X == -1)? 0 : PURPLE;
 
-    return( detected_color );
+    ScanData ret = {};
+    if( (detected_color & RED) != 0 )
+    {
+        ret.color = RED;
+        ret.location = red_pos;
+    }
+    else if( (detected_color & ORANGE) != 0 )
+    {
+        ret.color = ORANGE;
+        ret.location = orange_pos;
+    }
+    else if( (detected_color & YELLOW) != 0 )
+    {
+        ret.color = YELLOW;
+        ret.location = yellow_pos;
+    }
+    else if( (detected_color & GREEN) != 0 )
+    {
+        ret.color = GREEN;
+        ret.location = green_pos;
+    }
+    else if( (detected_color & BLUE) != 0 )
+    {
+        ret.color = BLUE;
+        ret.location = blue_pos;
+    }
+    else if( (detected_color & PURPLE) != 0 )
+    {
+        ret.color = PURPLE;
+        ret.location = purple_pos;
+    }
+    else
+    {
+        ret.color = UNKNOWN;
+        ret.location = red_pos;
+    }
+    return( ret );
+}
+
+void Eyes::learnRed(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        red_finder = new ColorFinder(hue, 10, 45, 0, 30, 80);
+    }
+    else
+    {
+        red_finder = new ColorFinder(hue, 20, 45, 0, 30, 100);
+    }
+    httpd::red_finder = red_finder;
+    delete( ini );
+}
+
+void Eyes::learnOrange(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        orange_finder = new ColorFinder(hue, 15, 35, 0, 20, 80);
+    }
+    else
+    {
+        orange_finder = new ColorFinder(hue, 5, 35, 0, 30, 100);
+    }
+    httpd::orange_finder = orange_finder;
+    delete( ini );
+}
+
+void Eyes::learnYellow(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        yellow_finder = new ColorFinder(hue, 15, 65, 50, 30, 80);
+    }
+    else
+    {
+        yellow_finder = new ColorFinder(hue, 5, 65, 50, 30, 100);
+    }
+    httpd::yellow_finder = yellow_finder;
+    delete( ini );
+}
+
+void Eyes::learnGreen(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        green_finder = new ColorFinder(hue, 10, 20, 0, 30, 80);
+    }
+    else
+    {
+        green_finder = new ColorFinder(hue, 20, 20, 0, 30, 100);
+    }
+    httpd::green_finder = green_finder;
+    delete( ini );
+}
+
+void Eyes::learnBlue(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        blue_finder = new ColorFinder(hue, 10, 30, 30, 30, 80);
+    }
+    else
+    {
+        blue_finder = new ColorFinder(hue, 20, 30, 30, 30, 100);
+    }
+    httpd::blue_finder = blue_finder;
+    delete( ini );
+}
+
+void Eyes::learnPurple(int hue, bool isLearning)
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    if( isLearning )
+    {
+        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 80);
+    }
+    else
+    {
+        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 100);
+    }
+    httpd::purple_finder = purple_finder;
+    delete( ini );
 }
 
 int coord2index( int row, int column )
@@ -177,8 +303,9 @@ int coord2maculaindex( int row, int column, int macStartRow, int macStartColumn,
     return( (column-macStartColumn) + (row-macStartRow)*rowSize );
 }
 
+
 // look at the center
-int Eyes::maculaLook(double percent)
+ScanData Eyes::maculaLook(double percent)
 {
     // calc the right starting coordinates
     int macH = Camera::HEIGHT/(100.0/percent);
@@ -191,7 +318,7 @@ int Eyes::maculaLook(double percent)
     return( maculaLook(startRow, startCol, percent) );
 }
 
-int Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
+ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
 {
     Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
     Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
@@ -294,96 +421,81 @@ int Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
     rgb_output = NULL;
     delete( hsv_output );
     hsv_output = NULL;
-    return( detected_color );
-}
 
-void Eyes::learnRed(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
+    ScanData ret = {};
+    Point2D macOrigin = Point2D(macStartColumn, macStartRow);
+    ret.maculaOrigin = macOrigin;
+    if( (detected_color & RED) != 0 )
     {
-        red_finder = new ColorFinder(hue, 10, 45, 0, 30, 80);
+        ret.color = RED;
+        ret.location = red_pos;
+    }
+    else if( (detected_color & ORANGE) != 0 )
+    {
+        ret.color = ORANGE;
+        ret.location = orange_pos;
+    }
+    else if( (detected_color & YELLOW) != 0 )
+    {
+        ret.color = YELLOW;
+        ret.location = yellow_pos;
+    }
+    else if( (detected_color & GREEN) != 0 )
+    {
+        ret.color = GREEN;
+        ret.location = green_pos;
+    }
+    else if( (detected_color & BLUE) != 0 )
+    {
+        ret.color = BLUE;
+        ret.location = blue_pos;
+    }
+    else if( (detected_color & PURPLE) != 0 )
+    {
+        ret.color = PURPLE;
+        ret.location = purple_pos;
     }
     else
     {
-        red_finder = new ColorFinder(hue, 20, 45, 0, 30, 100);
+        ret.color = UNKNOWN;
+        ret.location = red_pos;
     }
-    httpd::red_finder = red_finder;
-    delete( ini );
+    return( ret );
 }
 
-void Eyes::learnOrange(int hue, bool isLearning)
+void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
 {
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        orange_finder = new ColorFinder(hue, 15, 35, 0, 20, 80);
-    }
-    else
-    {
-        orange_finder = new ColorFinder(hue, 5, 35, 0, 30, 100);
-    }
-    httpd::orange_finder = orange_finder;
-    delete( ini );
-}
+    int macH = Camera::HEIGHT/(100.0/percent);
+    int macW = Camera::WIDTH/(100.0/percent);
 
-void Eyes::learnYellow(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        yellow_finder = new ColorFinder(hue, 15, 65, 50, 30, 80);
-    }
-    else
-    {
-        yellow_finder = new ColorFinder(hue, 5, 65, 50, 30, 100);
-    }
-    httpd::yellow_finder = yellow_finder;
-    delete( ini );
-}
+    Point2D stopPoint( -1000, -1000 );
+    ScanData stop = {};
+    stop.location = stopPoint;
+    stop.color = UNKNOWN;
 
-void Eyes::learnGreen(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        green_finder = new ColorFinder(hue, 10, 20, 0, 30, 80);
-    }
-    else
-    {
-        green_finder = new ColorFinder(hue, 20, 20, 0, 30, 100);
-    }
-    httpd::green_finder = green_finder;
-    delete( ini );
-}
+    int iter = 0;
 
-void Eyes::learnBlue(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
+    for( int row=0; row<Camera::HEIGHT-macH+1; row+=macH )
     {
-        blue_finder = new ColorFinder(hue, 10, 30, 30, 30, 80);
+        for( int col=0; col<Camera::WIDTH-macW+1; col+= macW )
+        {
+            time_t startTimer;
+            time_t nowTimer;
+            time(&startTimer);
+            time(&nowTimer);
+            //while( difftime(nowTimer, startTimer) < 0.001 )
+            //{
+                ScanData temp = maculaLook( row, col, percent );
+                temp.tilt = tilt;
+                temp.pan = pan;
+                retList[iter] = temp;
+                time(&nowTimer);
+            //}
+            iter++;
+            //maculaLook( row, col, percent );
+        }
     }
-    else
-    {
-        blue_finder = new ColorFinder(hue, 20, 30, 30, 30, 100);
-    }
-    httpd::blue_finder = blue_finder;
-    delete( ini );
-}
-
-void Eyes::learnPurple(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 80);
-    }
-    else
-    {
-        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 100);
-    }
-    httpd::purple_finder = purple_finder;
-    delete( ini );
+    retList[iter] = stop;
+    return;
 }
 

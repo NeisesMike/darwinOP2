@@ -258,7 +258,7 @@ void Player::interpretColor( int col )
 
 void Player::observe()
 {
-    interpretColor(body.eyes.look());
+    interpretColor(body.eyes.look().color);
     return;
 }
 
