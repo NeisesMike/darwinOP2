@@ -58,8 +58,10 @@ class Eyes
         // return the detected color
         int look();
 
-        // like look but only includes the central X% of the image
-        int maculaLook();
+        // like look but only includes the central 10% of the image
+        int maculaLook(double percent);
+        // only includes the designated 10% of the image
+        int maculaLook(int row, int column, double percent);
 
     private:
         ColorFinder* red_finder;

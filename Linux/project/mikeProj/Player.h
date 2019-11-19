@@ -40,6 +40,9 @@ class Player
 {
     public:
 
+        // simple mode for rapid prototyping
+        void debug();
+
         // learn one color
         void learnRed();
         void learnOrange();

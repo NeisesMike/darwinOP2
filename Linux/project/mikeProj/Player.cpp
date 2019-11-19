@@ -17,6 +17,8 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 
     lastDetected = UNKNOWN;
 
+    /*
+
     // init the voice
     int heap_size = 21000000;  // default scheme heap size
     int load_init_files = 1; // we want the festival init files loaded
@@ -27,6 +29,14 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
     // festival will crash, and anything we want to say
     // will be lost if it's queued after the current output
     festival_wait_for_spooler();
+
+    */
+}
+
+void Player::debug()
+{
+    body.eyes.learnRed( 340, false );
+    return;
 }
 
 void Player::learnColors()
@@ -254,7 +264,8 @@ void Player::observe()
 
 void Player::scan()
 {
-    interpretColor(body.eyes.maculaLook());
+    //interpretColor(body.eyes.maculaLook());
+    body.scan();
     return;
 }
 

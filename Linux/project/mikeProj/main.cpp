@@ -25,16 +25,23 @@ int main(void)
     // init the player
     Player* DarCon = new Player();
 
-    DarCon->greet();
-    DarCon->changeGemColor( BLUE );
-    DarCon->statusCheck();
-    DarCon->learnColors();
+    //DarCon->greet();
+    //DarCon->changeGemColor( BLUE );
+    //DarCon->statusCheck();
+    //DarCon->learnColors();
 
+    DarCon->debug();
+
+    DarCon->scan();
+
+    /*
     while(1)
     {
         //DarCon->observe(); 
         DarCon->scan();
     }
+    */
+
     delete( DarCon );
     return(0);
 }

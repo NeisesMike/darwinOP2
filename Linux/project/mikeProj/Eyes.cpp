@@ -171,27 +171,44 @@ int coord2index( int row, int column )
 
 // for rgb frames
 // assume the row, col pair is in the domain
-int coord2maculaindex( int row, int column )
+int coord2maculaindex( int row, int column, int macStartRow, int macStartColumn, double percent )
 {
-    return( (column-145) + (row-109)*32 );
+    int rowSize = Camera::WIDTH / (100.0/percent);
+    return( (column-macStartColumn) + (row-macStartRow)*rowSize );
 }
 
-int Eyes::maculaLook()
+// look at the center
+int Eyes::maculaLook(double percent)
+{
+    // calc the right starting coordinates
+    int macH = Camera::HEIGHT/(100.0/percent);
+    int macW = Camera::WIDTH/(100.0/percent);
+
+    int startRow = (Camera::HEIGHT - macH)/2 + 1;
+    int startCol = (Camera::WIDTH - macW)/2 + 1;
+
+    // the first pixel of the percent% macula 
+    return( maculaLook(startRow, startCol, percent) );
+}
+
+int Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
 {
     Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
     Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
-    Image* hsv_output = new Image(Camera::WIDTH/10, Camera::HEIGHT/10, Image::HSV_PIXEL_SIZE);
+    Image* hsv_output = new Image(Camera::WIDTH/(100.0/percent), Camera::HEIGHT/(100.0/percent), Image::HSV_PIXEL_SIZE);
+    int macH = Camera::HEIGHT/(100.0/percent);
+    int macW = Camera::WIDTH/(100.0/percent);
 
     LinuxCamera::GetInstance()->CaptureFrame(); 
     memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
 
-    // selectively copy the center of the original imag
+    // selectively a chunk of the original imag
     Image* hsvFrame = LinuxCamera::GetInstance()->fbuffer->m_HSVFrame;
-    for( int row=Camera::HEIGHT*0.45+1; row<Camera::HEIGHT*0.55; row++ )
+    for( int row=macStartRow; row<macStartRow+macH; row++ )
     {
-        for( int column=Camera::WIDTH*0.45+1; column<Camera::WIDTH*0.55; column++ )
+        for( int column=macStartColumn; column<macStartColumn+macW; column++ )
         {
-            int smallIndex = coord2maculaindex( row, column );
+            int smallIndex = coord2maculaindex( row, column, macStartRow, macStartColumn, percent );
             int bigIndex = coord2index( row, column );
             for( int i=0; i<Image::HSV_PIXEL_SIZE; i++ )
             {
@@ -208,12 +225,12 @@ int Eyes::maculaLook()
     purple_pos = purple_finder->GetPosition(hsv_output);
 
     unsigned char r, g, b;
-    for( int row=Camera::HEIGHT*0.45+1; row<Camera::HEIGHT*0.55; row++ )
+    for( int row=macStartRow; row<macStartRow+macH; row++ )
     {
-        for( int column=Camera::WIDTH*0.45+1; column<Camera::WIDTH*0.55; column++ )
+        for( int column=macStartColumn; column<macStartColumn+macW; column++ )
         {
             r = 0; g = 0; b = 0;
-            int smallIndex = coord2maculaindex( row, column );
+            int smallIndex = coord2maculaindex( row, column, macStartRow, macStartColumn, percent );
             int bigIndex = coord2index( row, column );
 
             if(red_finder->m_result->m_ImageData[smallIndex] == 1)
@@ -274,7 +291,9 @@ int Eyes::maculaLook()
     detected_color |= (purple_pos.X == -1)? 0 : PURPLE;
 
     delete( rgb_output );
+    rgb_output = NULL;
     delete( hsv_output );
+    hsv_output = NULL;
     return( detected_color );
 }
 

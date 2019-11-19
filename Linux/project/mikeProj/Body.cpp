@@ -5,6 +5,7 @@
  */
 
 #include "Body.h"
+#include <time.h>
 
 void change_current_dir()
 {
@@ -123,6 +124,86 @@ void Body::changeGemColor( Color col )
             cm730.WriteWord(cm730.ID_CM, cm730.P_LED_HEAD_L, cm730.MakeColor(225, 0, 225), 0);
             break;
     }
+    return;
+}
+
+void lookForThree(Eyes& eyes, int percent)
+{
+    time_t startTimer;
+    time_t nowTimer;
+    time(&startTimer);
+    time(&nowTimer);
+    while( difftime(nowTimer, startTimer) < 3 )
+    {
+        eyes.maculaLook( percent );
+        time(&nowTimer);
+    }
+    return;
+}
+void lookForThree(Eyes& eyes, int percent, int row, int col)
+{
+    time_t startTimer;
+    time_t nowTimer;
+    time(&startTimer);
+    time(&nowTimer);
+    while( difftime(nowTimer, startTimer) < 3 )
+    {
+        eyes.maculaLook( row, col, percent );
+        time(&nowTimer);
+    }
+    return;
+}
+
+void Body::scan()
+{
+    // ===============================================
+    // from left to right
+        // take a picture
+        // scan it for cards
+        // add potential cards to a list
+    // ===============================================
+    
+    // build a list of head positions
+    /*
+    sleep(2);
+    moveHead( -90, 0 );
+    lookForThree(eyes);
+    moveHead( -30, -20 );
+    lookForThree(eyes);
+    moveHead( 30, -20 );
+    lookForThree(eyes);
+    moveHead( 90, 0 );
+    lookForThree(eyes);
+    */
+    moveHead( 0, -20 );
+    lookForThree( eyes, 10 );
+    lookForThree( eyes, 10, 0, 0 );
+    lookForThree( eyes, 10, 216, 288 );
+
+    
+
+
+
+
+
+    // ===============================================
+    // for each potential card,
+        // center the gaze at that card
+        // add its new center to a list
+    // ===============================================
+
+    // ===============================================
+    // for each newly centered card
+        // if it is too close to another card
+        // remove it from the list
+    // ===============================================
+
+    // ===============================================
+    // for each filtered card
+        // center the gaze at that card
+        // return the final position
+    // ===============================================
+
     return;
 }
 
