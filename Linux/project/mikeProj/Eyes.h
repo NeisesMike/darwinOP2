@@ -69,8 +69,10 @@ class Eyes
 
         // like look but only includes the central 10% of the image
         ScanData maculaLook(double percent);
-        // only includes the designated 10% of the image
+        // always take a new picture
         ScanData maculaLook(int row, int column, double percent);
+        // only includes the designated percent% of each dimension
+        ScanData maculaLook(int row, int column, double percent, bool needTakePicture);
 
         // partition and analyze the image
         // return a list of midpoints

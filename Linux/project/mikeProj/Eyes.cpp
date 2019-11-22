@@ -320,13 +320,21 @@ ScanData Eyes::maculaLook(double percent)
 
 ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
 {
+    return( maculaLook(int macStartRow, int macStartColumn, double percent, true) );
+}
+
+ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, bool needTakePicture)
+{
     Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
     Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
     Image* hsv_output = new Image(Camera::WIDTH/(100.0/percent), Camera::HEIGHT/(100.0/percent), Image::HSV_PIXEL_SIZE);
     int macH = Camera::HEIGHT/(100.0/percent);
     int macW = Camera::WIDTH/(100.0/percent);
 
-    LinuxCamera::GetInstance()->CaptureFrame(); 
+    if( needTakePicture )
+    {
+        LinuxCamera::GetInstance()->CaptureFrame(); 
+    }
     memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
 
     // selectively a chunk of the original imag
@@ -467,6 +475,7 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
 {
     int macH = Camera::HEIGHT/(100.0/percent);
     int macW = Camera::WIDTH/(100.0/percent);
+    LinuxCamera::GetInstance()->CaptureFrame(); 
 
     Point2D stopPoint( -1000, -1000 );
     ScanData stop = {};
@@ -485,7 +494,7 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
             time(&nowTimer);
             //while( difftime(nowTimer, startTimer) < 0.001 )
             //{
-                ScanData temp = maculaLook( row, col, percent );
+                ScanData temp = maculaLook( row, col, percent, false );
                 temp.tilt = tilt;
                 temp.pan = pan;
                 retList[iter] = temp;
