@@ -36,6 +36,9 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 void Player::debug()
 {
     body.eyes.learnRed( 340, false );
+    m_debug = true;
+    body.m_debug = true;
+    body.eyes.m_debug = true;
     return;
 }
 

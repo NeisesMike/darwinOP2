@@ -49,6 +49,7 @@ class Eyes
 
         Eyes();
         ~Eyes();
+        bool m_debug;
 
         bool tryHit( Color col );
 

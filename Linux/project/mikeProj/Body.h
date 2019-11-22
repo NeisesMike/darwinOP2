@@ -38,6 +38,8 @@ class Body
 {
     public:
 
+        bool m_debug;
+
         void makeBodyLanguage();
 
         void changeGemColor( Color col );

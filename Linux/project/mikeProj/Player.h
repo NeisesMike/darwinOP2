@@ -42,6 +42,7 @@ class Player
 
         // simple mode for rapid prototyping
         void debug();
+        bool m_debug;
 
         // learn one color
         void learnRed();

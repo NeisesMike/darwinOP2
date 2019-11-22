@@ -9,6 +9,8 @@
 
 Eyes::Eyes()
 {
+    m_debug = true;
+
     minIni* ini = new minIni(INI_FILE_PATH);
 
     LinuxCamera::GetInstance()->Initialize(0);
@@ -102,55 +104,58 @@ ScanData Eyes::look()
     blue_pos = blue_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
     purple_pos = purple_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
 
-    unsigned char r, g, b;
-    for(int i = 0; i < rgb_output->m_NumberOfPixels; i++)
+    if( m_debug )
     {
-        r = 0; g = 0; b = 0;
-        if(red_finder->m_result->m_ImageData[i] == 1)
+        unsigned char r, g, b;
+        for(int i = 0; i < rgb_output->m_NumberOfPixels; i++)
         {
-            r = 255;
-            g = 0;
-            b = 0;
-        }
-        if(orange_finder->m_result->m_ImageData[i] == 1)
-        {
-            r = 255;
-            g = 128;
-            b = 0;
-        }
-        if(yellow_finder->m_result->m_ImageData[i] == 1)
-        {
-            r = 255;
-            g = 255;
-            b = 0;
-        }
-        if(green_finder->m_result->m_ImageData[i] == 1)
-        {
-            r = 0;
-            g = 255;
-            b = 0;
-        }
-        if(blue_finder->m_result->m_ImageData[i] == 1)
-        {
-            r = 0;
-            g = 0;
-            b = 255;
-        }
-        if(purple_finder->m_result->m_ImageData[i] == 1)
-        {
-            r = 255;
-            g = 0;
-            b = 255;
-        }
+            r = 0; g = 0; b = 0;
+            if(red_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 255;
+                g = 0;
+                b = 0;
+            }
+            if(orange_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 255;
+                g = 128;
+                b = 0;
+            }
+            if(yellow_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 255;
+                g = 255;
+                b = 0;
+            }
+            if(green_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 0;
+                g = 255;
+                b = 0;
+            }
+            if(blue_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 0;
+                g = 0;
+                b = 255;
+            }
+            if(purple_finder->m_result->m_ImageData[i] == 1)
+            {
+                r = 255;
+                g = 0;
+                b = 255;
+            }
 
-        if(r > 0 || g > 0 || b > 0)
-        {
-            rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 0] = r;
-            rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 1] = g;
-            rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 2] = b;
+            if(r > 0 || g > 0 || b > 0)
+            {
+                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 0] = r;
+                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 1] = g;
+                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 2] = b;
+            }
         }
+        streamer->send_image(rgb_output);
     }
-    streamer->send_image(rgb_output);
 
     int detected_color = 0;
 
@@ -359,62 +364,64 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     blue_pos = blue_finder->GetPosition(hsv_output);
     purple_pos = purple_finder->GetPosition(hsv_output);
 
-    unsigned char r, g, b;
-    for( int row=macStartRow; row<macStartRow+macH; row++ )
+    if( m_debug )
     {
-        for( int column=macStartColumn; column<macStartColumn+macW; column++ )
+        unsigned char r, g, b;
+        for( int row=macStartRow; row<macStartRow+macH; row++ )
         {
-            r = 0; g = 0; b = 0;
-            int smallIndex = coord2maculaindex( row, column, macStartRow, macStartColumn, percent );
-            int bigIndex = coord2index( row, column );
+            for( int column=macStartColumn; column<macStartColumn+macW; column++ )
+            {
+                r = 0; g = 0; b = 0;
+                int smallIndex = coord2maculaindex( row, column, macStartRow, macStartColumn, percent );
+                int bigIndex = coord2index( row, column );
 
-            if(red_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 255;
-                g = 0;
-                b = 0;
-            }
-            if(orange_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 255;
-                g = 128;
-                b = 0;
-            }
-            if(yellow_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 255;
-                g = 255;
-                b = 0;
-            }
-            if(green_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 0;
-                g = 255;
-                b = 0;
-            }
-            if(blue_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 0;
-                g = 0;
-                b = 255;
-            }
-            if(purple_finder->m_result->m_ImageData[smallIndex] == 1)
-            {
-                r = 255;
-                g = 0;
-                b = 255;
-            }
+                if(red_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 255;
+                    g = 0;
+                    b = 0;
+                }
+                if(orange_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 255;
+                    g = 128;
+                    b = 0;
+                }
+                if(yellow_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 255;
+                    g = 255;
+                    b = 0;
+                }
+                if(green_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 0;
+                    g = 255;
+                    b = 0;
+                }
+                if(blue_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 0;
+                    g = 0;
+                    b = 255;
+                }
+                if(purple_finder->m_result->m_ImageData[smallIndex] == 1)
+                {
+                    r = 255;
+                    g = 0;
+                    b = 255;
+                }
 
-            if(r > 0 || g > 0 || b > 0)
-            {
-                rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 0] = r;
-                rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 1] = g;
-                rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 2] = b;
+                if(r > 0 || g > 0 || b > 0)
+                {
+                    rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 0] = r;
+                    rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 1] = g;
+                    rgb_output->m_ImageData[bigIndex*rgb_output->m_PixelSize + 2] = b;
+                }
             }
         }
+        streamer->send_image(rgb_output);
     }
-
-    streamer->send_image(rgb_output);
 
     int detected_color = 0;
 
@@ -501,7 +508,6 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
                 time(&nowTimer);
             //}
             iter++;
-            //maculaLook( row, col, percent );
         }
     }
     retList[iter] = stop;
