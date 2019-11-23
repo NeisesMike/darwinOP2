@@ -70,6 +70,47 @@ void Player::learnColors()
     return;
 }
 
+void Player::learnCardSize()
+{
+    say("I need you to help me learn how big a card is.");
+
+    // to ensure high quality color matching
+    say("First, please show me what red looks like.");
+    int redHue = learnRed();
+
+    say("Now, please show me a red card close to me.");
+    body.moveHead( 0, -20 );
+    sleep(3);
+
+    // learn the max size by growing the match range down from 100
+    for( int min=100; min>0; min-- )
+    {
+        body.eyes.learnCardSize(redHue, min, 100);
+        if( body.eyes.tryHit(RED) )
+        {
+            m_cardMaxSize = min;
+            break;
+        }
+    }
+
+    say("Now, please show me a red card away from me.");
+    body.moveHead( 0, -20 );
+    sleep(3);
+
+    // learn the min size by growing the match range up from 0
+    for( int max=0; max<100; max++ )
+    {
+        body.eyes.learnCardSize(redHue, 0, max);
+        if( body.eyes.tryHit(RED) )
+        {
+            m_cardMinSize = max;
+            break;
+        }
+    }
+
+    return;
+}
+
 // TODO
 void Player::calibrateVision()
 {

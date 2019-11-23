@@ -295,6 +295,15 @@ void Eyes::learnPurple(int hue, bool isLearning)
     delete( ini );
 }
 
+void Eyes::learnCardSize( int hue, int min, int max )
+{
+    minIni* ini = new minIni(INI_FILE_PATH);
+    red_finder = new ColorFinder(hue, 40, 20, 20, min, max);
+    httpd::red_finder = red_finder;
+    delete( ini );
+    return;
+}
+
 int coord2index( int row, int column )
 {
     return( column + row*320 );

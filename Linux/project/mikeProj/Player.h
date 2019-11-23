@@ -45,15 +45,18 @@ class Player
         bool m_debug;
 
         // learn one color
-        void learnRed();
-        void learnOrange();
-        void learnYellow();
-        void learnGreen();
-        void learnBlue();
-        void learnPurple();
+        int learnRed();
+        int learnOrange();
+        int learnYellow();
+        int learnGreen();
+        int learnBlue();
+        int learnPurple();
 
         // learn, in sequence, the colors of the game.
         void learnColors();
+
+        // learn the approx range of the size of a card
+        void learnCardSize();
 
         // associate each card with a location ( a 2Dpos a la gaze )
         // allow for some error plox
@@ -106,7 +109,11 @@ class Player
         //CM730 cm730;
         Body body;
         //Eyes eyes;
+        
         double kinestheticMemory[8];
+        int m_cardMinSize;
+        int m_cardMaxSize;
+
         Color theirCard;
         int theirCardPos;
         Color boardMemory[8];

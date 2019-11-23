@@ -64,6 +64,9 @@ class Eyes
         void learnBlue(int hue, bool isLearning);
         void learnPurple(int hue, bool isLearning);
 
+        // give a min/max, reset the global card size range
+        void learnCardSize(int hue, int min, int max);
+
         // do a look
         // return the detected color
         ScanData look();

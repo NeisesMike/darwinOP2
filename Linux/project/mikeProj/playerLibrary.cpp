@@ -7,7 +7,7 @@ int getMid(int bot, int top)
     return( (bot+top-360)/2 );
 }
 
-void Player::learnRed()
+int Player::learnRed()
 {
     say("Please show me RED.");
     body.moveHead( 0, -20 );
@@ -71,10 +71,10 @@ void Player::learnRed()
 
     body.eyes.learnRed(hue, false);
 
-    return;
+    return(hue);
 }
 
-void Player::learnOrange()
+int Player::learnOrange()
 {
     say("Please show me Orange.");
     body.moveHead( 0, -20 );
@@ -138,10 +138,10 @@ void Player::learnOrange()
 
     body.eyes.learnOrange(hue, false);
 
-    return;
+    return(hue);
 }
 
-void Player::learnYellow()
+int Player::learnYellow()
 {
     say("Please show me Yellow.");
     body.moveHead( 0, -20 );
@@ -205,10 +205,10 @@ void Player::learnYellow()
 
     body.eyes.learnYellow(hue, false);
 
-    return;
+    return(hue);
 }
 
-void Player::learnGreen()
+int Player::learnGreen()
 {
     say("Please show me Green.");
     body.moveHead( 0, -20 );
@@ -272,10 +272,10 @@ void Player::learnGreen()
 
     body.eyes.learnGreen(hue, false);
 
-    return;
+    return(hue);
 }
 
-void Player::learnBlue()
+int Player::learnBlue()
 {
     say("Please show me Blue.");
     body.moveHead( 0, -20 );
@@ -339,10 +339,10 @@ void Player::learnBlue()
 
     body.eyes.learnBlue(hue, false);
 
-    return;
+    return(hue);
 }
 
-void Player::learnPurple()
+int Player::learnPurple()
 {
     say("Please show me Purple.");
     body.moveHead( 0, -20 );
@@ -406,5 +406,5 @@ void Player::learnPurple()
 
     body.eyes.learnPurple(hue, false);
 
-    return;
+    return(hue);
 }
