@@ -28,19 +28,18 @@ int main(void)
     //DarCon->greet();
     //DarCon->changeGemColor( BLUE );
     //DarCon->statusCheck();
-    //DarCon->learnColors();
 
     DarCon->debug();
+    DarCon->learnCardSize();
+    DarCon->learnColors();
 
-    DarCon->scan();
+//    DarCon->scan();
 
-    /*
     while(1)
     {
-        //DarCon->observe(); 
-        DarCon->scan();
+        DarCon->observe(); 
+        //DarCon->scan();
     }
-    */
 
     delete( DarCon );
     return(0);

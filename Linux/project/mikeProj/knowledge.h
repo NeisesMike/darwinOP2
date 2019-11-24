@@ -10,7 +10,8 @@ enum Color
     YELLOW = 8,
     GREEN = 16,
     BLUE = 32,
-    PURPLE = 64
+    PURPLE = 64,
+    BACK = 128 
 };
 
 #endif

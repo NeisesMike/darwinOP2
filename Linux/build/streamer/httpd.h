@@ -319,6 +319,7 @@ public:
     static ColorFinder* green_finder;
     static ColorFinder* blue_finder;
     static ColorFinder* purple_finder;
+    static ColorFinder* back_finder;
     static minIni*      ini;
 	static bool ClientRequest;
 

@@ -48,6 +48,7 @@ ColorFinder* httpd::yellow_finder;
 ColorFinder* httpd::green_finder;
 ColorFinder* httpd::blue_finder;
 ColorFinder* httpd::purple_finder;
+ColorFinder* httpd::back_finder;
 minIni*      httpd::ini;
 bool httpd::ClientRequest(false);
 

@@ -51,6 +51,7 @@ class Player
         int learnGreen();
         int learnBlue();
         int learnPurple();
+        int learnBack();
 
         // learn, in sequence, the colors of the game.
         void learnColors();
@@ -111,8 +112,6 @@ class Player
         //Eyes eyes;
         
         double kinestheticMemory[8];
-        int m_cardMinSize;
-        int m_cardMaxSize;
 
         Color theirCard;
         int theirCardPos;

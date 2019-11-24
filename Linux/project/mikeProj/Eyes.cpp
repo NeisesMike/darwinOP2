@@ -10,6 +10,8 @@
 Eyes::Eyes()
 {
     m_debug = true;
+    m_minCardSize = 30;
+    m_maxCardSize = 80;
 
     minIni* ini = new minIni(INI_FILE_PATH);
 
@@ -23,14 +25,6 @@ Eyes::Eyes()
     red_finder->LoadINISettings(ini, "RED");
     httpd::red_finder = red_finder;
 
-    orange_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
-    orange_finder->LoadINISettings(ini, "ORANGE");
-    httpd::orange_finder = orange_finder;
-
-    yellow_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
-    yellow_finder->LoadINISettings(ini, "YELLOW");
-    httpd::yellow_finder = yellow_finder;
-
     green_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
     green_finder->LoadINISettings(ini, "GREEN");
     httpd::green_finder = green_finder;
@@ -39,11 +33,23 @@ Eyes::Eyes()
     blue_finder->LoadINISettings(ini, "BLUE");
     httpd::blue_finder = blue_finder;
 
-    purple_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
-    purple_finder->LoadINISettings(ini, "PURPLE");
-    httpd::purple_finder = purple_finder;
+    back_finder = new ColorFinder(0, 0, 20, 40, 24, 50.0);
+    back_finder->LoadINISettings(ini, "BACK");
+    httpd::back_finder = back_finder;
 
     /* UNUSED COLORS
+
+       orange_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
+       orange_finder->LoadINISettings(ini, "ORANGE");
+       httpd::orange_finder = orange_finder;
+
+       yellow_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
+       yellow_finder->LoadINISettings(ini, "YELLOW");
+       httpd::yellow_finder = yellow_finder;
+
+       purple_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
+       purple_finder->LoadINISettings(ini, "PURPLE");
+       httpd::purple_finder = purple_finder;
 
        pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
        pink_finder->LoadINISettings(ini, "PINK");
@@ -71,26 +77,52 @@ Eyes::Eyes()
 Eyes::~Eyes()
 {
     delete( red_finder );
-    delete( orange_finder );
-    delete( yellow_finder );
     delete( green_finder );
     delete( blue_finder );
-    delete( purple_finder );
     delete( streamer );
 }
+
+void Eyes::setMinCardSize( int size )
+{
+    m_minCardSize = size;
+}
+
+void Eyes::setMaxCardSize( int size )
+{
+    m_maxCardSize = size;
+}
+
 bool Eyes::tryHit( Color col )
 {
-    int detected_color = look().color;
-    if( detected_color == col )
+    if( look().color == col )
     {
         return( true );
     }
     return( false );
 }
 
+bool Eyes::tryHitSize( Color col )
+{
+    int detected_color0 = look().color;
+    int detected_color1 = look().color;
+    int detected_color2 = look().color;
+
+    if( detected_color0 == col )
+    {
+        if( detected_color0 == detected_color1 )
+        {
+            if( detected_color0 == detected_color2 )
+            {
+                return( true );
+            }
+        }
+    }
+    return( false );
+}
+
 ScanData Eyes::look()
 {
-    Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
+    Point2D red_pos, green_pos, blue_pos, back_pos;
 
     LinuxCamera::GetInstance()->CaptureFrame();
 
@@ -98,11 +130,9 @@ ScanData Eyes::look()
     memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
 
     red_pos = red_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
-    orange_pos = orange_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
-    yellow_pos = yellow_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
     green_pos = green_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
     blue_pos = blue_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
-    purple_pos = purple_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
+    back_pos = back_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
 
     if( m_debug )
     {
@@ -114,18 +144,6 @@ ScanData Eyes::look()
             {
                 r = 255;
                 g = 0;
-                b = 0;
-            }
-            if(orange_finder->m_result->m_ImageData[i] == 1)
-            {
-                r = 255;
-                g = 128;
-                b = 0;
-            }
-            if(yellow_finder->m_result->m_ImageData[i] == 1)
-            {
-                r = 255;
-                g = 255;
                 b = 0;
             }
             if(green_finder->m_result->m_ImageData[i] == 1)
@@ -140,10 +158,10 @@ ScanData Eyes::look()
                 g = 0;
                 b = 255;
             }
-            if(purple_finder->m_result->m_ImageData[i] == 1)
+            if(back_finder->m_result->m_ImageData[i] == 1)
             {
                 r = 255;
-                g = 0;
+                g = 255;
                 b = 255;
             }
 
@@ -160,27 +178,15 @@ ScanData Eyes::look()
     int detected_color = 0;
 
     detected_color |= (red_pos.X == -1)? 0 : RED;
-    detected_color |= (orange_pos.X == -1)? 0 : ORANGE;
-    detected_color |= (yellow_pos.X == -1)? 0 : YELLOW;
     detected_color |= (green_pos.X == -1)? 0 : GREEN;
     detected_color |= (blue_pos.X == -1)? 0 : BLUE;
-    detected_color |= (purple_pos.X == -1)? 0 : PURPLE;
+    detected_color |= (back_pos.X == -1)? 0 : BACK;
 
     ScanData ret = {};
     if( (detected_color & RED) != 0 )
     {
         ret.color = RED;
         ret.location = red_pos;
-    }
-    else if( (detected_color & ORANGE) != 0 )
-    {
-        ret.color = ORANGE;
-        ret.location = orange_pos;
-    }
-    else if( (detected_color & YELLOW) != 0 )
-    {
-        ret.color = YELLOW;
-        ret.location = yellow_pos;
     }
     else if( (detected_color & GREEN) != 0 )
     {
@@ -192,16 +198,17 @@ ScanData Eyes::look()
         ret.color = BLUE;
         ret.location = blue_pos;
     }
-    else if( (detected_color & PURPLE) != 0 )
+    else if( (detected_color & BACK) != 0 )
     {
-        ret.color = PURPLE;
-        ret.location = purple_pos;
+        ret.color = BACK;
+        ret.location = back_pos;
     }
     else
     {
         ret.color = UNKNOWN;
         ret.location = red_pos;
     }
+    delete(rgb_output);
     return( ret );
 }
 
@@ -214,39 +221,9 @@ void Eyes::learnRed(int hue, bool isLearning)
     }
     else
     {
-        red_finder = new ColorFinder(hue, 20, 45, 0, 30, 100);
+        red_finder = new ColorFinder(hue, 20, 45, 0, m_minCardSize, m_maxCardSize);
     }
     httpd::red_finder = red_finder;
-    delete( ini );
-}
-
-void Eyes::learnOrange(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        orange_finder = new ColorFinder(hue, 15, 35, 0, 20, 80);
-    }
-    else
-    {
-        orange_finder = new ColorFinder(hue, 5, 35, 0, 30, 100);
-    }
-    httpd::orange_finder = orange_finder;
-    delete( ini );
-}
-
-void Eyes::learnYellow(int hue, bool isLearning)
-{
-    minIni* ini = new minIni(INI_FILE_PATH);
-    if( isLearning )
-    {
-        yellow_finder = new ColorFinder(hue, 15, 65, 50, 30, 80);
-    }
-    else
-    {
-        yellow_finder = new ColorFinder(hue, 5, 65, 50, 30, 100);
-    }
-    httpd::yellow_finder = yellow_finder;
     delete( ini );
 }
 
@@ -259,7 +236,7 @@ void Eyes::learnGreen(int hue, bool isLearning)
     }
     else
     {
-        green_finder = new ColorFinder(hue, 20, 20, 0, 30, 100);
+        green_finder = new ColorFinder(hue, 20, 20, 0, m_minCardSize, m_maxCardSize);
     }
     httpd::green_finder = green_finder;
     delete( ini );
@@ -274,32 +251,32 @@ void Eyes::learnBlue(int hue, bool isLearning)
     }
     else
     {
-        blue_finder = new ColorFinder(hue, 20, 30, 30, 30, 100);
+        blue_finder = new ColorFinder(hue, 20, 30, 30, m_minCardSize, m_maxCardSize);
     }
     httpd::blue_finder = blue_finder;
     delete( ini );
 }
 
-void Eyes::learnPurple(int hue, bool isLearning)
+void Eyes::learnBack(int hue, bool isLearning)
 {
     minIni* ini = new minIni(INI_FILE_PATH);
     if( isLearning )
     {
-        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 80);
+        back_finder = new ColorFinder(hue, 10, 20, 40, 30, 80);
     }
     else
     {
-        purple_finder = new ColorFinder(hue, 40, 20, 20, 30, 100);
+        back_finder = new ColorFinder(hue, 20, 20, 40, m_minCardSize, m_maxCardSize);
     }
-    httpd::purple_finder = purple_finder;
+    httpd::back_finder = back_finder;
     delete( ini );
 }
 
 void Eyes::learnCardSize( int hue, int min, int max )
 {
     minIni* ini = new minIni(INI_FILE_PATH);
-    red_finder = new ColorFinder(hue, 40, 20, 20, min, max);
-    httpd::red_finder = red_finder;
+    green_finder = new ColorFinder(hue, 40, 20, 20, min, max);
+    httpd::green_finder = green_finder;
     delete( ini );
     return;
 }
@@ -334,12 +311,12 @@ ScanData Eyes::maculaLook(double percent)
 
 ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
 {
-    return( maculaLook(int macStartRow, int macStartColumn, double percent, true) );
+    return( maculaLook(macStartRow, macStartColumn, percent, true) );
 }
 
 ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, bool needTakePicture)
 {
-    Point2D red_pos, orange_pos, yellow_pos, green_pos, blue_pos, purple_pos;
+    Point2D red_pos, green_pos, blue_pos, back_pos;
     Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
     Image* hsv_output = new Image(Camera::WIDTH/(100.0/percent), Camera::HEIGHT/(100.0/percent), Image::HSV_PIXEL_SIZE);
     int macH = Camera::HEIGHT/(100.0/percent);
@@ -367,11 +344,9 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     }
 
     red_pos = red_finder->GetPosition(hsv_output);
-    orange_pos = orange_finder->GetPosition(hsv_output);
-    yellow_pos = yellow_finder->GetPosition(hsv_output);
     green_pos = green_finder->GetPosition(hsv_output);
     blue_pos = blue_finder->GetPosition(hsv_output);
-    purple_pos = purple_finder->GetPosition(hsv_output);
+    back_pos = back_finder->GetPosition(hsv_output);
 
     if( m_debug )
     {
@@ -390,18 +365,6 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
                     g = 0;
                     b = 0;
                 }
-                if(orange_finder->m_result->m_ImageData[smallIndex] == 1)
-                {
-                    r = 255;
-                    g = 128;
-                    b = 0;
-                }
-                if(yellow_finder->m_result->m_ImageData[smallIndex] == 1)
-                {
-                    r = 255;
-                    g = 255;
-                    b = 0;
-                }
                 if(green_finder->m_result->m_ImageData[smallIndex] == 1)
                 {
                     r = 0;
@@ -414,10 +377,10 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
                     g = 0;
                     b = 255;
                 }
-                if(purple_finder->m_result->m_ImageData[smallIndex] == 1)
+                if(back_finder->m_result->m_ImageData[smallIndex] == 1)
                 {
                     r = 255;
-                    g = 0;
+                    g = 255;
                     b = 255;
                 }
 
@@ -435,11 +398,8 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     int detected_color = 0;
 
     detected_color |= (red_pos.X == -1)? 0 : RED;
-    detected_color |= (orange_pos.X == -1)? 0 : ORANGE;
-    detected_color |= (yellow_pos.X == -1)? 0 : YELLOW;
     detected_color |= (green_pos.X == -1)? 0 : GREEN;
     detected_color |= (blue_pos.X == -1)? 0 : BLUE;
-    detected_color |= (purple_pos.X == -1)? 0 : PURPLE;
 
     delete( rgb_output );
     rgb_output = NULL;
@@ -454,16 +414,6 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
         ret.color = RED;
         ret.location = red_pos;
     }
-    else if( (detected_color & ORANGE) != 0 )
-    {
-        ret.color = ORANGE;
-        ret.location = orange_pos;
-    }
-    else if( (detected_color & YELLOW) != 0 )
-    {
-        ret.color = YELLOW;
-        ret.location = yellow_pos;
-    }
     else if( (detected_color & GREEN) != 0 )
     {
         ret.color = GREEN;
@@ -474,10 +424,10 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
         ret.color = BLUE;
         ret.location = blue_pos;
     }
-    else if( (detected_color & PURPLE) != 0 )
+    else if( (detected_color & BACK) != 0 )
     {
-        ret.color = PURPLE;
-        ret.location = purple_pos;
+        ret.color = BACK;
+        ret.location = back_pos;
     }
     else
     {
@@ -510,11 +460,11 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
             time(&nowTimer);
             //while( difftime(nowTimer, startTimer) < 0.001 )
             //{
-                ScanData temp = maculaLook( row, col, percent, false );
-                temp.tilt = tilt;
-                temp.pan = pan;
-                retList[iter] = temp;
-                time(&nowTimer);
+            ScanData temp = maculaLook( row, col, percent, false );
+            temp.tilt = tilt;
+            temp.pan = pan;
+            retList[iter] = temp;
+            time(&nowTimer);
             //}
             iter++;
         }

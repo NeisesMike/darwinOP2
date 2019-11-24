@@ -32,6 +32,7 @@ struct ColorMem
    int green;
    int blue;
    int purple;
+   int back;
 };
 
 struct ScanData
@@ -51,18 +52,22 @@ class Eyes
         ~Eyes();
         bool m_debug;
 
+        // see if can identify
         bool tryHit( Color col );
+        // more rigorous
+        bool tryHitSize( Color col );
+
+        void setMinCardSize(int size);
+        void setMaxCardSize(int size);
 
         // learn, in sequence, the colors of the game.
         void learnColors();
 
         // give a hue integer, reset the related color_finder
         void learnRed(int hue, bool isLearning);
-        void learnOrange(int hue, bool isLearning);
-        void learnYellow(int hue, bool isLearning);
         void learnGreen(int hue, bool isLearning);
         void learnBlue(int hue, bool isLearning);
-        void learnPurple(int hue, bool isLearning);
+        void learnBack(int hue, bool isLearning);
 
         // give a min/max, reset the global card size range
         void learnCardSize(int hue, int min, int max);
@@ -84,12 +89,13 @@ class Eyes
 
     private:
         ColorFinder* red_finder;
-        ColorFinder* orange_finder;
-        ColorFinder* yellow_finder;
         ColorFinder* green_finder; 
         ColorFinder* blue_finder;
-        ColorFinder* purple_finder;
+        ColorFinder* back_finder;
         mjpg_streamer* streamer;
+
+        double m_minCardSize;
+        double m_maxCardSize;
 };
 
 #endif

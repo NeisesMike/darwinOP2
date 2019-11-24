@@ -17,7 +17,6 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 
     lastDetected = UNKNOWN;
 
-    /*
 
     // init the voice
     int heap_size = 21000000;  // default scheme heap size
@@ -30,7 +29,6 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
     // will be lost if it's queued after the current output
     festival_wait_for_spooler();
 
-    */
 }
 
 void Player::debug()
@@ -44,8 +42,9 @@ void Player::debug()
 
 void Player::learnColors()
 {
-    body.moveHead(180, 40);
-    say("I need you to help me learn my colors.");
+    body.moveHead(0, 40);
+    //say("I need you to help me learn my colors.");
+    say("want learn colors");
 
     printf( "\nred\n" );
     learnRed();
@@ -59,55 +58,58 @@ void Player::learnColors()
     learnGreen();
     printf( "\nblue\n" );
     learnBlue();
+    printf( "\nback\n" );
+    learnBack();
     /*
     printf( "\npurple\n" );
     learnPurple();
     */
 
-    body.moveHead(180, 40);
+    body.moveHead(0, 20);
     say("Okay, I'm ready to identify those colors.");
-    body.moveHead(0, -20);
+    body.moveHead(0, -10);
     return;
 }
 
 void Player::learnCardSize()
 {
-    say("I need you to help me learn how big a card is.");
+    //say("I need you to help me learn how big a card is.");
 
     // to ensure high quality color matching
-    say("First, please show me what red looks like.");
-    int redHue = learnRed();
+    //say("First, please show me what green looks like.");
+    int greenHue = learnGreen();
 
-    say("Now, please show me a red card close to me.");
+    say("Now, please show me a green card close to me.");
     body.moveHead( 0, -20 );
     sleep(3);
 
     // learn the max size by growing the match range down from 100
-    for( int min=100; min>0; min-- )
+    for( double min=13; min>0; min-=.1 )
     {
-        body.eyes.learnCardSize(redHue, min, 100);
-        if( body.eyes.tryHit(RED) )
+        body.eyes.learnCardSize(greenHue, min, 13);
+        if( body.eyes.tryHitSize(GREEN) )
         {
-            m_cardMaxSize = min;
+            body.eyes.setMaxCardSize(min);
+            printf( "max size is %f\n", min );
             break;
         }
     }
 
-    say("Now, please show me a red card away from me.");
-    body.moveHead( 0, -20 );
+    say("Now, please show me a green card away from me.");
+    body.moveHead( 0, 0 );
     sleep(3);
 
     // learn the min size by growing the match range up from 0
-    for( int max=0; max<100; max++ )
+    for( double max=0; max<100; max+=.1 )
     {
-        body.eyes.learnCardSize(redHue, 0, max);
-        if( body.eyes.tryHit(RED) )
+        body.eyes.learnCardSize(greenHue, 0, max);
+        if( body.eyes.tryHitSize(GREEN) )
         {
-            m_cardMinSize = max;
+            body.eyes.setMinCardSize(max);
+            printf( "min size is %f\n", max );
             break;
         }
     }
-
     return;
 }
 
@@ -267,18 +269,6 @@ void Player::interpretColor( int col )
         body.changeGemColor( RED );
         festival_say_text("red");
     }
-    else if((col & ORANGE) != 0 &lastDetected != ORANGE)
-    {
-        lastDetected = ORANGE;
-        body.changeGemColor( ORANGE );
-        festival_say_text("orange");
-    }
-    else if((col & YELLOW) != 0 &lastDetected != YELLOW)
-    {
-        lastDetected = YELLOW;
-        body.changeGemColor( YELLOW );
-        festival_say_text("yellow");
-    }
     else if((col & GREEN) != 0 &lastDetected != GREEN)
     {
         lastDetected = GREEN;
@@ -291,11 +281,11 @@ void Player::interpretColor( int col )
         body.changeGemColor( BLUE );
         festival_say_text("blue");
     }
-    else if((col & PURPLE) != 0 &lastDetected != PURPLE)
+    else if((col & BACK) != 0 &lastDetected != BACK)
     {
-        lastDetected = PURPLE;
-        body.changeGemColor( PURPLE );
-        festival_say_text("purple");
+        lastDetected = BACK;
+        body.changeGemColor( BACK );
+        festival_say_text("backside");
     }
     return;
 }

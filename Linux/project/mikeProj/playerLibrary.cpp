@@ -11,7 +11,7 @@ int Player::learnRed()
 {
     say("Please show me RED.");
     body.moveHead( 0, -20 );
-    sleep(5);
+    sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
     int startBottom = 330;
@@ -74,145 +74,11 @@ int Player::learnRed()
     return(hue);
 }
 
-int Player::learnOrange()
-{
-    say("Please show me Orange.");
-    body.moveHead( 0, -20 );
-    sleep(5);
-
-    // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 345;
-    int startTop = 35;
-
-    // this will be the chosen value for the indicated ORANGEor
-    // also a couple helpers
-    int hue = 0;
-    int bottomHue = 0;
-    int topHue = 0;
-
-    // scan from ntc up
-    for( int i=startBottom; i<startBottom+360; i++ )
-    {
-        int iter = i;
-        while( iter > 360 )
-        {
-            iter -= 360;
-        }
-        while( iter < 0 )
-        {
-            iter += 360;
-        }
-        
-        body.eyes.learnOrange(iter, true);
-        if( body.eyes.tryHit(ORANGE) )
-        {
-            bottomHue = iter;
-            break;
-        }
-    }
-
-    // scan from ntc down
-    for( int i=startTop; i>startTop-360; i-- )
-    {
-        int iter = i;
-        while( iter > 360 )
-        {
-            iter -= 360;
-        }
-        while( iter < 0 )
-        {
-            iter += 360;
-        }
-        
-        body.eyes.learnOrange(iter, true);
-        if( body.eyes.tryHit(ORANGE) )
-        {
-            topHue = iter;
-            break;
-        }
-    }
-
-    // split the difference
-    hue = getMid(bottomHue, topHue);
-    printf( "Orange is %d\n", hue );
-
-    body.eyes.learnOrange(hue, false);
-
-    return(hue);
-}
-
-int Player::learnYellow()
-{
-    say("Please show me Yellow.");
-    body.moveHead( 0, -20 );
-    sleep(5);
-
-    // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 5;
-    int startTop = 85;
-
-    // this will be the chosen value for the indicated YELLOWor
-    // also a couple helpers
-    int hue = 0;
-    int bottomHue = 0;
-    int topHue = 0;
-
-    // scan from ntc up
-    for( int i=startBottom; i<startBottom+360; i++ )
-    {
-        int iter = i;
-        while( iter > 360 )
-        {
-            iter -= 360;
-        }
-        while( iter < 0 )
-        {
-            iter += 360;
-        }
-        
-        body.eyes.learnYellow(iter, true);
-        if( body.eyes.tryHit(YELLOW) )
-        {
-            bottomHue = iter;
-            break;
-        }
-    }
-
-    // scan from ntc down
-    for( int i=startTop; i>startTop-360; i-- )
-    {
-        int iter = i;
-        while( iter > 360 )
-        {
-            iter -= 360;
-        }
-        while( iter < 0 )
-        {
-            iter += 360;
-        }
-        
-        body.eyes.learnYellow(iter, true);
-        if( body.eyes.tryHit(YELLOW) )
-        {
-            topHue = iter;
-            break;
-        }
-    }
-
-    // split the difference
-    hue = getMid(bottomHue, topHue);
-    printf( "Yellow is %d\n", hue );
-
-    body.eyes.learnYellow(hue, false);
-
-    return(hue);
-}
-
 int Player::learnGreen()
 {
     say("Please show me Green.");
     body.moveHead( 0, -20 );
-    sleep(5);
+    sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
     int startBottom = 121;
@@ -279,7 +145,7 @@ int Player::learnBlue()
 {
     say("Please show me Blue.");
     body.moveHead( 0, -20 );
-    sleep(5);
+    sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
     int startBottom = 194;
@@ -342,17 +208,17 @@ int Player::learnBlue()
     return(hue);
 }
 
-int Player::learnPurple()
+int Player::learnBack()
 {
-    say("Please show me Purple.");
+    say("Please show me the backside color.");
     body.moveHead( 0, -20 );
-    sleep(5);
+    sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
-    int startBottom = 220;
-    int startTop = 280;
+    int startBottom = 25;
+    int startTop = 55;
 
-    // this will be the chosen value for the indicated PURPLEor
+    // this will be the chosen value for the indicated REDor
     // also a couple helpers
     int hue = 0;
     int bottomHue = 0;
@@ -371,8 +237,8 @@ int Player::learnPurple()
             iter += 360;
         }
         
-        body.eyes.learnPurple(iter, true);
-        if( body.eyes.tryHit(PURPLE) )
+        body.eyes.learnBack(iter, true);
+        if( body.eyes.tryHit(BACK) )
         {
             bottomHue = iter;
             break;
@@ -392,8 +258,8 @@ int Player::learnPurple()
             iter += 360;
         }
         
-        body.eyes.learnPurple(iter, true);
-        if( body.eyes.tryHit(PURPLE) )
+        body.eyes.learnBack(iter, true);
+        if( body.eyes.tryHit(BACK) )
         {
             topHue = iter;
             break;
@@ -402,9 +268,9 @@ int Player::learnPurple()
 
     // split the difference
     hue = getMid(bottomHue, topHue);
-    printf( "Purple is %d\n", hue );
+    printf( "Backside is %d\n", hue );
 
-    body.eyes.learnPurple(hue, false);
+    body.eyes.learnBack(hue, false);
 
     return(hue);
 }
