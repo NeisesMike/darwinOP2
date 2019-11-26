@@ -145,13 +145,6 @@ void lookForOne(Eyes& eyes, int percent, int centerCol, int centerRow)
     return;
 }
 
-ScanData recenterGaze(Eyes& eyes, int percent, int centerCol, int centerRow)
-{
-    int startRow = centerRow - (Camera::HEIGHT/(100/percent)/2);
-    int startCol = centerCol - (Camera::WIDTH/(100/percent)/2);
-    return( eyes.maculaLook(startRow, startCol, percent) );
-}
-
 void refreshEyes(Eyes& eyes)
 {
     eyes.maculaLook(0,0,10);
@@ -216,7 +209,7 @@ ScanData* Body::scan()
         {
             break;
         }
-        if( temp.color == RED )
+        if( temp.color != UNKNOWN )
         {
             // center the gaze
             ScanData pantilt = centerGaze( temp );
@@ -257,6 +250,12 @@ ScanData* Body::scan()
             if( innerTemp.location.X == -1000 )
             {
                 break;
+            }
+
+            // only consider cards that have the same color
+            if( innerTemp.color != temp.color )
+            {
+                continue;
             }
 
             // if the tilts and pans are no more than a few degrees apart, skip

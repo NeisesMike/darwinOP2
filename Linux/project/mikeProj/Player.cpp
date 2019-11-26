@@ -288,26 +288,6 @@ void Player::observe()
 
 void Player::scan()
 {
-    //interpretColor(body.eyes.maculaLook());
-
-    /*
-    body.moveHead( -58, 0 );
-    for( int i=0; i<100; i++ )
-    {
-        observe();
-    }
-    body.moveHead( 0, 0 );
-    for( int i=0; i<100; i++ )
-    {
-        observe();
-    }
-    body.moveHead( 58, 0 );
-    for( int i=0; i<100; i++ )
-    {
-        observe();
-    }
-    */
-
     kinestheticMemory = body.scan();
     return;
 }
@@ -337,19 +317,29 @@ void Player::cardReport()
             break;
         }
 
-        Point2D center = Point2D(Camera::WIDTH/2, Camera::HEIGHT/2);
-        Point2D absLoc = temp.maculaOrigin + temp.location;
+        body.centerGaze( temp );
 
-        // get angle per pixel ratio
-        double horizRatio = Camera::VIEW_H_ANGLE / (double)Camera::WIDTH;
-        double vertRatio = Camera::VIEW_V_ANGLE / (double)Camera::HEIGHT;
+        if(temp.color & RED)
+        {
+            body.changeGemColor( RED );
+            festival_say_text("Here is a red card.");
+        }
+        else if(temp.color & GREEN)
+        {
+            body.changeGemColor( GREEN );
+            festival_say_text("Here is a green card.");
+        }
+        else if(temp.color & BLUE)
+        {
+            body.changeGemColor( BLUE );
+            festival_say_text("Here is a blue card.");
+        }
+        else if(temp.color & BACK)
+        {
+            body.changeGemColor( BACK );
+            festival_say_text("Here is an overturned card.");
+        }
 
-        Point2D displacement = center - absLoc;
-        int finalPan = temp.pan + (displacement.X * horizRatio);
-        int finalTilt = temp.tilt + (displacement.Y * vertRatio);
-
-        body.moveHead(finalPan, finalTilt);
-        say("Here is a red card.");
     }
     return;
 }
