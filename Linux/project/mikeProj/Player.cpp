@@ -43,27 +43,16 @@ void Player::debug()
 void Player::learnColors()
 {
     body.moveHead(0, 40);
-    //say("I need you to help me learn my colors.");
-    say("want learn colors");
+    say("Please help me learn my colors.");
 
     printf( "\nred\n" );
     learnRed();
-    /*
-    printf( "\norange\n" );
-    learnOrange();
-    printf( "\nyellow\n" );
-    learnYellow();
-    */
     printf( "\ngreen\n" );
     learnGreen();
     printf( "\nblue\n" );
     learnBlue();
     printf( "\nback\n" );
     learnBack();
-    /*
-    printf( "\npurple\n" );
-    learnPurple();
-    */
 
     body.moveHead(0, 20);
     say("Okay, I'm ready to identify those colors.");
@@ -271,10 +260,10 @@ void Player::interpretColor( int col )
         body.changeGemColor( BLUE );
         festival_say_text("blue");
     }
-    else if((col & BACK) != 0 &lastDetected != BACK)
+    else if((col & BACKSIDE) != 0 &lastDetected != BACKSIDE)
     {
-        lastDetected = BACK;
-        body.changeGemColor( BACK );
+        lastDetected = BACKSIDE;
+        body.changeGemColor( BACKSIDE );
         festival_say_text("backside");
     }
     return;
@@ -334,9 +323,9 @@ void Player::cardReport()
             body.changeGemColor( BLUE );
             festival_say_text("Here is a blue card.");
         }
-        else if(temp.color & BACK)
+        else if(temp.color & BACKSIDE)
         {
-            body.changeGemColor( BACK );
+            body.changeGemColor( BACKSIDE );
             festival_say_text("Here is an overturned card.");
         }
 

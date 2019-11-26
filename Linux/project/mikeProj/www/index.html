@@ -156,6 +156,7 @@ function imageOnclick() { // Clicking on the image will pause the stream
     <td id="td5" align="center" onClick="return extendmenu('5', this)" style="cursor:pointer; FONT-WEIGHT:normal; " bgcolor="#FFFFFF" width="80px" height="20px">[GREEN]</td>
     <td id="td6" align="center" onClick="return extendmenu('6', this)" style="cursor:pointer; FONT-WEIGHT:normal; " bgcolor="#FFFFFF" width="80px" height="20px">[BLUE]</td>
     <td id="td7" align="center" onClick="return extendmenu('7', this)" style="cursor:pointer; FONT-WEIGHT:normal; " bgcolor="#FFFFFF" width="80px" height="20px">[PURPLE]</td>
+    <td id="td8" align="center" onClick="return extendmenu('8', this)" style="cursor:pointer; FONT-WEIGHT:normal; " bgcolor="#FFFFFF" width="80px" height="20px">[BACKSIDE]</td>
     </tr>
     </table>
 
@@ -442,6 +443,47 @@ function imageOnclick() { // Clicking on the image will pause the stream
         <table width="300px"><tr align="center">
           <td width="160px"><input type="button" value="RELOAD" onclick="send_command('reload&section=purple')" style="width:100px; height:30px;"></td>
           <td width="160px"><input type="button" value="SAVE" onclick="send_command('save&section=purple')" style="width:100px; height:30px;"></td>
+        </tr></table>
+        </form>
+    </div>
+
+    <div id="sc8" class="tabcontent"  style="background-color: navy; width: 304px; height: 240px; padding: 8px">
+        <form name="command_panel" action="" onsubmit="return false;">
+          <font color="WHITE"><b>backside</b> HUE: ( 0 ~ 360 )</font> <br>
+          <input type="button" value="-1" onclick="send_command('hue_minus&value=1&section=backside')">
+          <input type="button" value="+1" onclick="send_command('hue_plus&value=1&section=backside')">
+          &nbsp;
+          <input type="button" value="-10" onclick="send_command('hue_minus&value=10&section=backside')">
+          <input type="button" value="+10" onclick="send_command('hue_plus&value=10&section=backside')">
+          <br /><br />
+          
+          <font color="WHITE">TOLERANCE: ( 0 ~ 179 )</font> <br>
+          <input type="button" value="-1" onclick="send_command('tolerance_minus&value=1&section=backside')">
+          <input type="button" value="+1" onclick="send_command('tolerance_plus&value=1&section=backside')">
+          &nbsp;
+          <input type="button" value="-10" onclick="send_command('tolerance_minus&value=10&section=backside')">
+          <input type="button" value="+10" onclick="send_command('tolerance_plus&value=10&section=backside')">
+          <br /><br />
+          
+          <font color="WHITE">MIN SATURATION: ( 0 ~ 100 )</font> <br>
+          <input type="button" value="-1" onclick="send_command('min_saturation_minus&value=1&section=backside')">
+          <input type="button" value="+1" onclick="send_command('min_saturation_plus&value=1&section=backside')">
+          &nbsp;
+          <input type="button" value="-10" onclick="send_command('min_saturation_minus&value=10&section=backside')">
+          <input type="button" value="+10" onclick="send_command('min_saturation_plus&value=10&section=backside')">
+          <br /><br />
+          
+          <font color="WHITE">MIN VALUE: ( 0 ~ 100 )</font> <br>
+          <input type="button" value="-1" onclick="send_command('min_value_minus&value=1&section=backside')">
+          <input type="button" value="+1" onclick="send_command('min_value_plus&value=1&section=backside')">
+          &nbsp;
+          <input type="button" value="-10" onclick="send_command('min_value_minus&value=10&section=backside')">
+          <input type="button" value="+10" onclick="send_command('min_value_plus&value=10&section=backside')">
+        <br><br>
+
+        <table width="300px"><tr align="center">
+          <td width="160px"><input type="button" value="RELOAD" onclick="send_command('reload&section=backside')" style="width:100px; height:30px;"></td>
+          <td width="160px"><input type="button" value="SAVE" onclick="send_command('save&section=backside')" style="width:100px; height:30px;"></td>
         </tr></table>
         </form>
     </div>

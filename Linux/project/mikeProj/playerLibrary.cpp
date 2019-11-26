@@ -222,7 +222,7 @@ int Player::learnBack()
     // also a couple helpers
     int hue = 0;
     int bottomHue = 0;
-    int topHue = 0;
+    int topHue = 60;
 
     // scan from ntc up
     for( int i=startBottom; i<startBottom+360; i++ )
@@ -238,7 +238,7 @@ int Player::learnBack()
         }
         
         body.eyes.learnBack(iter, true);
-        if( body.eyes.tryHit(BACK) )
+        if( body.eyes.tryHit(BACKSIDE) )
         {
             bottomHue = iter;
             break;
@@ -259,7 +259,7 @@ int Player::learnBack()
         }
         
         body.eyes.learnBack(iter, true);
-        if( body.eyes.tryHit(BACK) )
+        if( body.eyes.tryHit(BACKSIDE) )
         {
             topHue = iter;
             break;

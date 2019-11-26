@@ -32,7 +32,7 @@ struct ColorMem
    int green;
    int blue;
    int purple;
-   int back;
+   int backside;
 };
 
 struct ScanData
@@ -109,11 +109,15 @@ class Eyes
         ColorFinder* red_finder;
         ColorFinder* green_finder; 
         ColorFinder* blue_finder;
-        ColorFinder* back_finder;
+        ColorFinder* backside_finder;
         mjpg_streamer* streamer;
 
         double m_minCardSize;
         double m_maxCardSize;
+
+        ColorFinder* orange_finder;
+        ColorFinder* yellow_finder;
+        ColorFinder* purple_finder;
 };
 
 #endif

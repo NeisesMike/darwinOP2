@@ -48,7 +48,7 @@ ColorFinder* httpd::yellow_finder;
 ColorFinder* httpd::green_finder;
 ColorFinder* httpd::blue_finder;
 ColorFinder* httpd::purple_finder;
-ColorFinder* httpd::back_finder;
+ColorFinder* httpd::backside_finder;
 minIni*      httpd::ini;
 bool httpd::ClientRequest(false);
 
@@ -551,6 +551,7 @@ void httpd::command(int fd, char *parameter) {
       else if(strcmp(section, "green") == 0) finder = green_finder;
       else if(strcmp(section, "blue") == 0) finder = blue_finder;
       else if(strcmp(section, "purple") == 0) finder = purple_finder;
+      else if(strcmp(section, "backside") == 0) finder = backside_finder;
   }
 
   /*

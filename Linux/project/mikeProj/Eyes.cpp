@@ -33,11 +33,10 @@ Eyes::Eyes()
     blue_finder->LoadINISettings(ini, "BLUE");
     httpd::blue_finder = blue_finder;
 
-    back_finder = new ColorFinder(0, 0, 20, 40, 24, 50.0);
-    back_finder->LoadINISettings(ini, "BACK");
-    httpd::back_finder = back_finder;
+    backside_finder = new ColorFinder(0, 0, 20, 40, 24, 50.0);
+    backside_finder->LoadINISettings(ini, "BACKSIDE");
+    httpd::backside_finder = backside_finder;
 
-    /* UNUSED COLORS
 
        orange_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
        orange_finder->LoadINISettings(ini, "ORANGE");
@@ -51,6 +50,7 @@ Eyes::Eyes()
        purple_finder->LoadINISettings(ini, "PURPLE");
        httpd::purple_finder = purple_finder;
 
+    /* UNUSED COLORS
        pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
        pink_finder->LoadINISettings(ini, "PINK");
        httpd::pink_finder = pink_finder;
@@ -132,7 +132,7 @@ ScanData Eyes::look()
     red_pos = red_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
     green_pos = green_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
     blue_pos = blue_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
-    back_pos = back_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
+    back_pos = backside_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame);
 
     if( m_debug )
     {
@@ -158,7 +158,7 @@ ScanData Eyes::look()
                 g = 0;
                 b = 255;
             }
-            if(back_finder->m_result->m_ImageData[i] == 1)
+            if(backside_finder->m_result->m_ImageData[i] == 1)
             {
                 r = 255;
                 g = 255;
@@ -180,7 +180,7 @@ ScanData Eyes::look()
     detected_color |= (red_pos.X == -1)? 0 : RED;
     detected_color |= (green_pos.X == -1)? 0 : GREEN;
     detected_color |= (blue_pos.X == -1)? 0 : BLUE;
-    detected_color |= (back_pos.X == -1)? 0 : BACK;
+    detected_color |= (back_pos.X == -1)? 0 : BACKSIDE;
 
     ScanData ret = {};
     if( (detected_color & RED) != 0 )
@@ -198,9 +198,9 @@ ScanData Eyes::look()
         ret.color = BLUE;
         ret.location = blue_pos;
     }
-    else if( (detected_color & BACK) != 0 )
+    else if( (detected_color & BACKSIDE) != 0 )
     {
-        ret.color = BACK;
+        ret.color = BACKSIDE;
         ret.location = back_pos;
     }
     else
@@ -262,13 +262,13 @@ void Eyes::learnBack(int hue, bool isLearning)
     minIni* ini = new minIni(INI_FILE_PATH);
     if( isLearning )
     {
-        back_finder = new ColorFinder(hue, 10, 20, 40, 30, 80);
+        backside_finder = new ColorFinder(hue, 20, 0, 35, 30, 80);
     }
     else
     {
-        back_finder = new ColorFinder(hue, 20, 20, 40, m_minCardSize, m_maxCardSize);
+        backside_finder = new ColorFinder(hue, 60, 0, 35, m_minCardSize, m_maxCardSize);
     }
-    httpd::back_finder = back_finder;
+    httpd::backside_finder = backside_finder;
     delete( ini );
 }
 
@@ -348,7 +348,7 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     red_pos = red_finder->GetPosition(hsv_output);
     green_pos = green_finder->GetPosition(hsv_output);
     blue_pos = blue_finder->GetPosition(hsv_output);
-    back_pos = back_finder->GetPosition(hsv_output);
+    back_pos = backside_finder->GetPosition(hsv_output);
 
     if( m_debug )
     {
@@ -379,7 +379,7 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
                     g = 0;
                     b = 255;
                 }
-                if(back_finder->m_result->m_ImageData[smallIndex] == 1)
+                if(backside_finder->m_result->m_ImageData[smallIndex] == 1)
                 {
                     r = 255;
                     g = 255;
@@ -424,11 +424,11 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
         ret.location = blue_pos;
         ret.numPixels = blue_finder->GetNumPixels(hsv_output);
     }
-    else if( (detected_color & BACK) != 0 )
+    else if( (detected_color & BACKSIDE) != 0 )
     {
-        ret.color = BACK;
+        ret.color = BACKSIDE;
         ret.location = back_pos;
-        ret.numPixels = back_finder->GetNumPixels(hsv_output);
+        ret.numPixels = backside_finder->GetNumPixels(hsv_output);
     }
     else
     {

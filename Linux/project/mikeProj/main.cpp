@@ -25,25 +25,29 @@ int main(void)
     // init the player
     Player* DarCon = new Player();
 
-    //DarCon->greet();
-    //DarCon->changeGemColor( BLUE );
-    //DarCon->statusCheck();
+//    DarCon->greet();
+    DarCon->changeGemColor( BLUE );
+    DarCon->statusCheck();
 
-    DarCon->debug();
+    //DarCon->debug();
 //    DarCon->learnCardSize();
-//    DarCon->learnColors();
+    DarCon->learnColors();
+
+    /*
+    DarCon->say( "Please set out some cards now." );
+    DarCon->say( "I will wait five seconds." );
+    sleep(5);
 
     DarCon->scan();
     DarCon->cardReport();
     printf( "done!\n" );
+    */
 
-    /*
     while(1)
     {
-        //DarCon->observe(); 
+        DarCon->observe(); 
         //DarCon->scan();
     }
-    */
 
     delete( DarCon );
     return(0);
