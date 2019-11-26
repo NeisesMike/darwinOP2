@@ -10,8 +10,8 @@
 Eyes::Eyes()
 {
     m_debug = true;
-    m_minCardSize = 30;
-    m_maxCardSize = 80;
+    m_minCardSize = 2;
+    m_maxCardSize = 100;
 
     minIni* ini = new minIni(INI_FILE_PATH);
 
@@ -443,33 +443,41 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
     int macW = Camera::WIDTH/(100.0/percent);
     LinuxCamera::GetInstance()->CaptureFrame(); 
 
-    Point2D stopPoint( -1000, -1000 );
-    ScanData stop = {};
-    stop.location = stopPoint;
-    stop.color = UNKNOWN;
-
     int iter = 0;
+
+    // start after a stopPoint
+    ScanData item = retList[iter];
+    while( item.location.X != -1000 )
+    {
+        iter++;
+        item = retList[iter];
+    }
 
     for( int row=0; row<Camera::HEIGHT-macH+1; row+=macH )
     {
         for( int col=0; col<Camera::WIDTH-macW+1; col+= macW )
         {
-            time_t startTimer;
-            time_t nowTimer;
-            time(&startTimer);
-            time(&nowTimer);
-            //while( difftime(nowTimer, startTimer) < 0.001 )
-            //{
-            ScanData temp = maculaLook( row, col, percent, false );
-            temp.tilt = tilt;
-            temp.pan = pan;
-            retList[iter] = temp;
-            time(&nowTimer);
-            //}
-            iter++;
+            // can probably get a speedup out of not taking a picture every time
+            // is bugged now, tho
+            // always scans over the same picture :shrug:
+            ScanData temp = maculaLook( row, col, percent, true );
+            if( temp.color != UNKNOWN )
+            {
+                temp.tilt = tilt;
+                temp.pan = pan;
+                retList[iter] = temp;
+                iter++;
+            }
         }
     }
+
+    Point2D stopPoint( -1000, -1000 );
+    ScanData stop = {};
+    stop.location = stopPoint;
+    stop.color = UNKNOWN;
+
     retList[iter] = stop;
+
     return;
 }
 

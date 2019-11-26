@@ -30,14 +30,16 @@ int main(void)
     //DarCon->statusCheck();
 
     DarCon->debug();
-    DarCon->learnCardSize();
-    DarCon->learnColors();
+//    DarCon->learnCardSize();
+//    DarCon->learnColors();
 
-//    DarCon->scan();
+    //TODO
+    DarCon->scan();
+    DarCon->cardReport();
 
     while(1)
     {
-        DarCon->observe(); 
+        //DarCon->observe(); 
         //DarCon->scan();
     }
 

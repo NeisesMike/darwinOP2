@@ -33,7 +33,7 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 
 void Player::debug()
 {
-    body.eyes.learnRed( 340, false );
+    body.eyes.learnRed( 357, false );
     m_debug = true;
     body.m_debug = true;
     body.eyes.m_debug = true;
@@ -114,16 +114,6 @@ void Player::learnCardSize()
 }
 
 // TODO
-void Player::calibrateVision()
-{
-    for( int i=0; i<8; i++ )
-    {
-        kinestheticMemory[i] = 0;
-    }
-    return; 
-}
-
-// TODO
 Color Player::getCardAtPosition( int pos )
 {
     // watch out for hands ( red ? )
@@ -159,7 +149,7 @@ void Player::indicateChoice( int pos )
     // verbally indicate pos + 1 for sanity
 
     // turn gaze towards the appropriate card
-    double thisLocation = kinestheticMemory[pos];
+    //double thisLocation = kinestheticMemory[pos];
 
     // maybe point towards the appropriate card?
 
@@ -299,7 +289,7 @@ void Player::observe()
 void Player::scan()
 {
     //interpretColor(body.eyes.maculaLook());
-    body.scan();
+    kinestheticMemory = body.scan();
     return;
 }
 
@@ -316,3 +306,37 @@ void Player::greet()
     say("Hello, my name is Darwin.");
     return;
 }
+
+void Player::cardReport()
+{
+    int iter = 0;
+    // surely there won't be 1000 cards...
+    for( int i=0; i<1000; i++ )
+    {
+        ScanData temp = kinestheticMemory[i];
+        if( temp.location.X == -1000 )
+        {
+            break;
+        }
+
+        Point2D center = Point2D(Camera::WIDTH/2, Camera::HEIGHT/2);
+        Point2D absLoc = temp.maculaOrigin + temp.location;
+
+        // get angle per pixel ratio
+        double horizRatio = Camera::VIEW_H_ANGLE / (double)Camera::WIDTH;
+        double vertRatio = Camera::VIEW_V_ANGLE / (double)Camera::HEIGHT;
+
+        Point2D displacement = center - absLoc;
+        int finalPan = temp.pan + (displacement.X * horizRatio);
+        int finalTilt = temp.tilt + (displacement.Y * vertRatio);
+
+        printf( "center is %f\n", center.X );
+        printf( "absLoc is %f\n", absLoc.X );
+        printf( "final is %d\n", finalPan );
+
+        body.moveHead(finalPan, 0);
+        say("Here is a red card.");
+    }
+    return;
+}
+

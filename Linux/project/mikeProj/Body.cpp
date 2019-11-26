@@ -129,27 +129,14 @@ void Body::changeGemColor( Color col )
     return;
 }
 
-void lookForThree(Eyes& eyes, int percent)
+void lookForOne(Eyes& eyes, int percent, int centerCol, int centerRow)
 {
     time_t startTimer;
     time_t nowTimer;
     time(&startTimer);
     time(&nowTimer);
-    while( difftime(nowTimer, startTimer) < 3 )
-    {
-        eyes.maculaLook( percent );
-        time(&nowTimer);
-    }
-    return;
-}
-void lookForOne(Eyes& eyes, int percent, int col, int row)
-{
-    time_t startTimer;
-    time_t nowTimer;
-    time(&startTimer);
-    time(&nowTimer);
-    int startRow = row - (Camera::HEIGHT/(100/percent)/2);
-    int startCol = col - (Camera::HEIGHT/(100/percent)/2);
+    int startRow = centerRow - (Camera::HEIGHT/(100/percent)/2);
+    int startCol = centerCol - (Camera::WIDTH/(100/percent)/2);
     while( difftime(nowTimer, startTimer) < 1 )
     {
         eyes.maculaLook( startRow, startCol, percent );
@@ -158,7 +145,25 @@ void lookForOne(Eyes& eyes, int percent, int col, int row)
     return;
 }
 
-void Body::scan()
+ScanData recenterGaze(Eyes& eyes, int percent, int centerCol, int centerRow)
+{
+    int startRow = centerRow - (Camera::HEIGHT/(100/percent)/2);
+    int startCol = centerCol - (Camera::WIDTH/(100/percent)/2);
+    return( eyes.maculaLook(startRow, startCol, percent) );
+}
+
+void refreshEyes(Eyes& eyes)
+{
+    sleep(1);
+    eyes.maculaLook(0,0,10);
+    eyes.maculaLook(0,0,10);
+    eyes.maculaLook(0,0,10);
+    eyes.maculaLook(0,0,10);
+    eyes.maculaLook(0,0,10);
+    return;
+}
+
+ScanData* Body::scan()
 {
     // ===============================================
     // from left to right
@@ -166,89 +171,132 @@ void Body::scan()
         // scan it for cards
         // add potential cards to a list
     // ===============================================
-    
-    /*
-    moveHead( 0, -20 );
-    lookForThree( eyes, 10 );
-    lookForThree( eyes, 10, 0, 0 );
-    lookForThree( eyes, 10, 288, 216 );
-    */
 
-    ScanData* retList0 = (ScanData*)malloc(sizeof(ScanData)*400);
-    ScanData* retList1 = (ScanData*)malloc(sizeof(ScanData)*400);
-    ScanData* retList2 = (ScanData*)malloc(sizeof(ScanData)*400);
-    ScanData* retList3 = (ScanData*)malloc(sizeof(ScanData)*400);
-    int percent = 10;
+    // NOTE
+    // Camera H angle is 58.0 degrees
+    // so we try to partition 174 degrees of viewing here
 
-    // build a list of head positions
-    moveHead( -90, 0 );
-    sleep(1);
-    eyes.partitionScan( percent, -90, 0, retList0 ); 
-    moveHead( -30, -20 );
-    sleep(1);
-    eyes.partitionScan( percent, -30, -20, retList1 ); 
-    moveHead( 30, -20 );
-    sleep(1);
-    eyes.partitionScan( percent, 30, -20, retList2 ); 
-    moveHead( 90, 0 );
-    sleep(1);
-    eyes.partitionScan( percent, 90, 0, retList3 ); 
+    int percent = 20;
+    int numHeadPositions = 3;
+    // *2 because a macula can get a hit on the same position twice
+    // happens when matches on head position overlap
+    int numPossibleMatches = (100/percent)*2*numHeadPositions;
 
-    // add the lists to one big list please
-    ScanData* retList = (ScanData*)malloc(sizeof(ScanData)*1600);
-    int iter = 0;
-    for( int i=0; i<400; i++ )
-    {
-        ScanData temp = retList0[i];
-        if( temp.location.X == -1000 )
-        {
-            break;
-        }
-        retList[iter] = temp;
-        iter++;
-    }
-    for( int i=0; i<400; i++ )
-    {
-        ScanData temp = retList1[i];
-        if( temp.location.X == -1000 )
-        {
-            break;
-        }
-        retList[iter] = temp;
-        iter++;
-    }
-    for( int i=0; i<400; i++ )
-    {
-        ScanData temp = retList2[i];
-        if( temp.location.X == -1000 )
-        {
-            break;
-        }
-        retList[iter] = temp;
-        iter++;
-    }
-    for( int i=0; i<400; i++ )
-    {
-        ScanData temp = retList3[i];
-        if( temp.location.X == -1000 )
-        {
-            break;
-        }
-        retList[iter] = temp;
-        iter++;
-    }
+    ScanData* retList = (ScanData*)malloc(sizeof(ScanData)*numPossibleMatches);
+
     ScanData stop = {};
     Point2D stopPoint = Point2D(-1000,-1000);
     stop.location = stopPoint;
-    retList[iter] = stop;
+    retList[0] = stop;
 
-    //check the big list
+    // build a list of head positions
+    moveHead( -58, 0 );
+    refreshEyes(eyes);
+    eyes.partitionScan( percent, -58, 0, retList ); 
+    moveHead( 0, -20 );
+    refreshEyes(eyes);
+    eyes.partitionScan( percent, 0, -20, retList ); 
+    moveHead( 58, 0 );
+    refreshEyes(eyes);
+    eyes.partitionScan( percent, 58, 0, retList ); 
 
-    Point2D center = Point2D(Camera::WIDTH/2, Camera::HEIGHT/2);
-    Point2D relCenter = Point2D(Camera::WIDTH/(100/percent)/2, Camera::HEIGHT/(100/percent)/2);
-    for( int i=0; i<1600; i++ )
+    // ===============================================
+    // for each potential card,
+        // center the gaze at that card
+        // add its new center to a list
+    // ===============================================
+
+    ScanData* onceFilteredList = (ScanData*)malloc(sizeof(ScanData)*(100/percent)*4*numHeadPositions);
+    int iter = 0;
+    for( int i=0; i<numPossibleMatches; i++ )
     {
         ScanData temp = retList[i];
+        if( temp.location.X == -1000 )
+        {
+            break;
+        }
+        if( temp.color == RED )
+        {
+            moveHead(temp.pan, temp.tilt);
+            refreshEyes(eyes);
+
+            int cardX = temp.maculaOrigin.X + temp.location.X;
+            int cardY = temp.maculaOrigin.Y + temp.location.Y;
+            ScanData result = recenterGaze( eyes, percent+10, cardX, cardY );
+            result.pan = temp.pan;
+            result.tilt = temp.tilt;
+            onceFilteredList[iter] = result;
+            iter++;
+        }
+    }
+    onceFilteredList[iter] = stop;
+
+    // ===============================================
+    // for each newly centered card
+        // if it is too close to another card
+        // remove it from the list
+    // ===============================================
+
+    ScanData* twiceFilteredList = (ScanData*)malloc(sizeof(ScanData)*(100/percent)*4*numHeadPositions);
+    twiceFilteredList[0] = stop;
+    iter = 0;
+    for( int i=0; i<numPossibleMatches; i++ )
+    {
+        ScanData temp = onceFilteredList[i];
+        if( temp.location.X == -1000 )
+        {
+            break;
+        }
+
+        // no choice but to iterate over all matches again :sigh:
+        bool isTempMatched = false;
+        for( int j=0; j<numPossibleMatches; j++ )
+        {
+            ScanData innerTemp = twiceFilteredList[j];
+            if( innerTemp.location.X == -1000 )
+            {
+                break;
+            }
+
+            if( innerTemp.tilt != temp.tilt || innerTemp.pan != temp.pan || innerTemp.color != temp.color )
+            {
+                continue;
+            }
+            
+            // if the x and y coords are within... 20% horiz and vert, skip
+            // assume no two cards are this close together
+            int xTolerance = Camera::WIDTH*0.1;
+            int yTolerance = Camera::HEIGHT*0.1;
+            if( (innerTemp.location.X-xTolerance < temp.location.X) && temp.location.X < (innerTemp.location.X+xTolerance) )
+            {
+                if( (innerTemp.location.Y-yTolerance < temp.location.Y) && temp.location.Y < (innerTemp.location.Y+yTolerance) )
+                {
+                    // skip this one!
+                    isTempMatched = true;
+                    break;
+                }
+            }
+            // otherwise, keep considering it!
+            isTempMatched = false;
+        }
+        if( !isTempMatched )
+        {
+            twiceFilteredList[iter] = temp;
+            iter++;
+        }
+    }
+    twiceFilteredList[iter] = stop;
+
+    // ===============================================
+    // for each filtered card
+        // center the gaze at that card
+        // return the final position
+    // ===============================================
+
+    // sanity check
+    for( int i=0; i<numPossibleMatches; i++ )
+    {
+        ScanData temp = twiceFilteredList[i];
         if( temp.location.X == -1000 )
         {
             break;
@@ -261,35 +309,15 @@ void Body::scan()
             // check our work
             printf( "mac x %f y %f\n", temp.maculaOrigin.X, temp.maculaOrigin.Y );
             printf( "loc x %f y %f\n", temp.location.X, temp.location.Y );
-            printf( "rel x %f y %f\n", relCenter.X, relCenter.Y );
             int cardX = temp.maculaOrigin.X + temp.location.X;
             int cardY = temp.maculaOrigin.Y + temp.location.Y;
-            lookForOne( eyes, 10, cardX, cardY );
+            lookForOne( eyes, percent, cardX, cardY );
         }
     }
 
-
-
-
-    // ===============================================
-    // for each potential card,
-        // center the gaze at that card
-        // add its new center to a list
-    // ===============================================
-
-    // ===============================================
-    // for each newly centered card
-        // if it is too close to another card
-        // remove it from the list
-    // ===============================================
-
-    // ===============================================
-    // for each filtered card
-        // center the gaze at that card
-        // return the final position
-    // ===============================================
-
-    return;
+    delete( retList );
+    delete( onceFilteredList );
+    return( twiceFilteredList );
 }
 
 void Body::statusCheck()

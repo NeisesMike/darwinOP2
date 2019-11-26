@@ -59,10 +59,6 @@ class Player
         // learn the approx range of the size of a card
         void learnCardSize();
 
-        // associate each card with a location ( a 2Dpos a la gaze )
-        // allow for some error plox
-        void calibrateVision();
-
         Color getCardAtPosition( int pos );
 
         // given memory of the card last upturned,
@@ -99,6 +95,9 @@ class Player
 
         // scan the board
         void scan();
+
+        // report on cards found
+        void cardReport();
         
         // check button status
         void statusCheck();
@@ -111,7 +110,7 @@ class Player
         Body body;
         //Eyes eyes;
         
-        double kinestheticMemory[8];
+        ScanData* kinestheticMemory;
 
         Color theirCard;
         int theirCardPos;

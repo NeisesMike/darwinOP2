@@ -45,7 +45,7 @@ class Body
         void changeGemColor( Color col );
 
         // do a look
-        void scan();
+        ScanData* scan();
 
         void statusCheck();
 
