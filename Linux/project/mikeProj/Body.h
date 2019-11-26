@@ -49,13 +49,13 @@ class Body
 
         void statusCheck();
 
-        void moveHead(Point2D pos);
-
         void moveHead(int pan, int tilt);
 
         int readHeadPan();
 
         int readHeadTilt();
+
+        ScanData centerGaze( ScanData card );
 
         Eyes eyes;
         Body();

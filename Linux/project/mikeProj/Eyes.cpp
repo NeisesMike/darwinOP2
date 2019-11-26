@@ -309,11 +309,13 @@ ScanData Eyes::maculaLook(double percent)
     return( maculaLook(startRow, startCol, percent) );
 }
 
+// look at this location
 ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
 {
     return( maculaLook(macStartRow, macStartColumn, percent, true) );
 }
 
+// fully generic
 ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, bool needTakePicture)
 {
     Point2D red_pos, green_pos, blue_pos, back_pos;
@@ -401,11 +403,6 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     detected_color |= (green_pos.X == -1)? 0 : GREEN;
     detected_color |= (blue_pos.X == -1)? 0 : BLUE;
 
-    delete( rgb_output );
-    rgb_output = NULL;
-    delete( hsv_output );
-    hsv_output = NULL;
-
     ScanData ret = {};
     Point2D macOrigin = Point2D(macStartColumn, macStartRow);
     ret.maculaOrigin = macOrigin;
@@ -413,27 +410,36 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
     {
         ret.color = RED;
         ret.location = red_pos;
+        ret.numPixels = red_finder->GetNumPixels(hsv_output);
     }
     else if( (detected_color & GREEN) != 0 )
     {
         ret.color = GREEN;
         ret.location = green_pos;
+        ret.numPixels = green_finder->GetNumPixels(hsv_output);
     }
     else if( (detected_color & BLUE) != 0 )
     {
         ret.color = BLUE;
         ret.location = blue_pos;
+        ret.numPixels = blue_finder->GetNumPixels(hsv_output);
     }
     else if( (detected_color & BACK) != 0 )
     {
         ret.color = BACK;
         ret.location = back_pos;
+        ret.numPixels = back_finder->GetNumPixels(hsv_output);
     }
     else
     {
         ret.color = UNKNOWN;
         ret.location = red_pos;
     }
+
+    delete( rgb_output );
+    rgb_output = NULL;
+    delete( hsv_output );
+    hsv_output = NULL;
     return( ret );
 }
 
@@ -460,7 +466,7 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
             // can probably get a speedup out of not taking a picture every time
             // is bugged now, tho
             // always scans over the same picture :shrug:
-            ScanData temp = maculaLook( row, col, percent, true );
+            ScanData temp = maculaLook( row, col, percent );
             if( temp.color != UNKNOWN )
             {
                 temp.tilt = tilt;
@@ -479,5 +485,34 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
     retList[iter] = stop;
 
     return;
+}
+
+ScanData Eyes::growMacula( ScanData card, int percent )
+{
+    ScanData result;
+    int maxPixels = 0;
+    int numPixels = 0;
+
+    int startRow = card.location.X - Camera::WIDTH/(100/percent)/2;
+    int startCol = card.location.Y - Camera::HEIGHT/(100/percent)/2;
+
+    for( int iPercent=0; iPercent<100; iPercent++ )
+    {
+        result = maculaLook(iPercent);
+        numPixels = result.numPixels; 
+        if( numPixels > maxPixels )
+        {
+            maxPixels = numPixels;
+        }
+        else if( numPixels == 0 )
+        {
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return( result );
 }
 

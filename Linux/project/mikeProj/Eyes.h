@@ -42,6 +42,20 @@ struct ScanData
     Point2D location;
     Color color;
     Point2D maculaOrigin;
+    int numPixels;
+
+    struct ScanData& operator=(const ScanData& rhs)
+    {
+        tilt = rhs.tilt;
+        pan = rhs.pan;
+        location.X = rhs.location.X;
+        location.Y = rhs.location.Y;
+        color = rhs.color;
+        maculaOrigin.X = rhs.maculaOrigin.X;
+        maculaOrigin.Y = rhs.maculaOrigin.Y;
+        numPixels = rhs.numPixels;
+        return *this;
+    }
 };
 
 class Eyes
@@ -86,6 +100,10 @@ class Eyes
         // partition and analyze the image
         // return a list of midpoints
         void partitionScan(double percent, int tilt, int pan, ScanData* retList);
+
+        // grow macula until encompass whole card
+        // return center point
+        ScanData growMacula( ScanData card, int percent );
 
     private:
         ColorFinder* red_finder;

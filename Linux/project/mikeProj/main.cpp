@@ -33,15 +33,17 @@ int main(void)
 //    DarCon->learnCardSize();
 //    DarCon->learnColors();
 
-    //TODO
     DarCon->scan();
     DarCon->cardReport();
+    printf( "done!\n" );
 
+    /*
     while(1)
     {
         //DarCon->observe(); 
         //DarCon->scan();
     }
+    */
 
     delete( DarCon );
     return(0);

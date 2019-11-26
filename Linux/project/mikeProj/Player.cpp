@@ -289,6 +289,25 @@ void Player::observe()
 void Player::scan()
 {
     //interpretColor(body.eyes.maculaLook());
+
+    /*
+    body.moveHead( -58, 0 );
+    for( int i=0; i<100; i++ )
+    {
+        observe();
+    }
+    body.moveHead( 0, 0 );
+    for( int i=0; i<100; i++ )
+    {
+        observe();
+    }
+    body.moveHead( 58, 0 );
+    for( int i=0; i<100; i++ )
+    {
+        observe();
+    }
+    */
+
     kinestheticMemory = body.scan();
     return;
 }
@@ -301,8 +320,7 @@ void Player::statusCheck()
 
 void Player::greet()
 {
-    Point2D up = Point2D(180.0, 150.0);
-    body.moveHead(up);
+    body.moveHead(0, 30);
     say("Hello, my name is Darwin.");
     return;
 }
@@ -330,11 +348,7 @@ void Player::cardReport()
         int finalPan = temp.pan + (displacement.X * horizRatio);
         int finalTilt = temp.tilt + (displacement.Y * vertRatio);
 
-        printf( "center is %f\n", center.X );
-        printf( "absLoc is %f\n", absLoc.X );
-        printf( "final is %d\n", finalPan );
-
-        body.moveHead(finalPan, 0);
+        body.moveHead(finalPan, finalTilt);
         say("Here is a red card.");
     }
     return;

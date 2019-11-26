@@ -154,7 +154,6 @@ ScanData recenterGaze(Eyes& eyes, int percent, int centerCol, int centerRow)
 
 void refreshEyes(Eyes& eyes)
 {
-    sleep(1);
     eyes.maculaLook(0,0,10);
     eyes.maculaLook(0,0,10);
     eyes.maculaLook(0,0,10);
@@ -172,24 +171,26 @@ ScanData* Body::scan()
         // add potential cards to a list
     // ===============================================
 
-    // NOTE
-    // Camera H angle is 58.0 degrees
-    // so we try to partition 174 degrees of viewing here
-
     int percent = 20;
     int numHeadPositions = 3;
+
     // *2 because a macula can get a hit on the same position twice
     // happens when matches on head position overlap
     int numPossibleMatches = (100/percent)*2*numHeadPositions;
 
-    ScanData* retList = (ScanData*)malloc(sizeof(ScanData)*numPossibleMatches);
-
     ScanData stop = {};
     Point2D stopPoint = Point2D(-1000,-1000);
     stop.location = stopPoint;
+    
+    // ===============================================
+    // grab all potential matches in the working area
+    // ===============================================
+
+    ScanData* retList = (ScanData*)malloc(sizeof(ScanData)*numPossibleMatches);
     retList[0] = stop;
 
-    // build a list of head positions
+    // Camera H angle is 58.0 degrees
+    // so we try to partition 174 degrees of viewing here
     moveHead( -58, 0 );
     refreshEyes(eyes);
     eyes.partitionScan( percent, -58, 0, retList ); 
@@ -217,14 +218,14 @@ ScanData* Body::scan()
         }
         if( temp.color == RED )
         {
-            moveHead(temp.pan, temp.tilt);
-            refreshEyes(eyes);
+            // center the gaze
+            ScanData pantilt = centerGaze( temp );
 
-            int cardX = temp.maculaOrigin.X + temp.location.X;
-            int cardY = temp.maculaOrigin.Y + temp.location.Y;
-            ScanData result = recenterGaze( eyes, percent+10, cardX, cardY );
-            result.pan = temp.pan;
-            result.tilt = temp.tilt;
+            // grow the macula
+            ScanData result = eyes.growMacula( temp, percent );
+            result.pan = pantilt.pan;
+            result.tilt = pantilt.tilt;
+
             onceFilteredList[iter] = result;
             iter++;
         }
@@ -249,7 +250,7 @@ ScanData* Body::scan()
         }
 
         // no choice but to iterate over all matches again :sigh:
-        bool isTempMatched = false;
+        bool doWeAlreadyHaveThisCard = false;
         for( int j=0; j<numPossibleMatches; j++ )
         {
             ScanData innerTemp = twiceFilteredList[j];
@@ -258,62 +259,36 @@ ScanData* Body::scan()
                 break;
             }
 
-            if( innerTemp.tilt != temp.tilt || innerTemp.pan != temp.pan || innerTemp.color != temp.color )
-            {
-                continue;
-            }
-            
+            // if the tilts and pans are no more than a few degrees apart, skip
             // if the x and y coords are within... 20% horiz and vert, skip
             // assume no two cards are this close together
+            int panTolerance = 5;
+            int tiltTolerance = 5;
             int xTolerance = Camera::WIDTH*0.1;
             int yTolerance = Camera::HEIGHT*0.1;
-            if( (innerTemp.location.X-xTolerance < temp.location.X) && temp.location.X < (innerTemp.location.X+xTolerance) )
+
+            bool isPanMatched = (innerTemp.pan-panTolerance < temp.pan) && temp.pan < (innerTemp.pan + panTolerance);
+            bool isTiltMatched = (innerTemp.tilt-tiltTolerance < temp.tilt) && temp.tilt < (innerTemp.tilt+tiltTolerance);
+            bool isXMatched = (innerTemp.location.X-xTolerance < temp.location.X) && temp.location.X < (innerTemp.location.X+xTolerance);
+            bool isYMatched = (innerTemp.location.Y-yTolerance < temp.location.Y) && temp.location.Y < (innerTemp.location.Y+yTolerance);
+
+            if( isPanMatched && isTiltMatched && isXMatched && isYMatched )
             {
-                if( (innerTemp.location.Y-yTolerance < temp.location.Y) && temp.location.Y < (innerTemp.location.Y+yTolerance) )
-                {
-                    // skip this one!
-                    isTempMatched = true;
-                    break;
-                }
+                // skip this one!
+                doWeAlreadyHaveThisCard = true;
+                break;
             }
+
             // otherwise, keep considering it!
-            isTempMatched = false;
+            doWeAlreadyHaveThisCard = false;
         }
-        if( !isTempMatched )
+        if( !doWeAlreadyHaveThisCard )
         {
             twiceFilteredList[iter] = temp;
             iter++;
         }
     }
     twiceFilteredList[iter] = stop;
-
-    // ===============================================
-    // for each filtered card
-        // center the gaze at that card
-        // return the final position
-    // ===============================================
-
-    // sanity check
-    for( int i=0; i<numPossibleMatches; i++ )
-    {
-        ScanData temp = twiceFilteredList[i];
-        if( temp.location.X == -1000 )
-        {
-            break;
-        }
-        if( temp.color == RED )
-        {
-            printf( "pan %d, tilt %d\n", temp.pan, temp.tilt );
-            moveHead(temp.pan, temp.tilt);
-
-            // check our work
-            printf( "mac x %f y %f\n", temp.maculaOrigin.X, temp.maculaOrigin.Y );
-            printf( "loc x %f y %f\n", temp.location.X, temp.location.Y );
-            int cardX = temp.maculaOrigin.X + temp.location.X;
-            int cardY = temp.maculaOrigin.Y + temp.location.Y;
-            lookForOne( eyes, percent, cardX, cardY );
-        }
-    }
 
     delete( retList );
     delete( onceFilteredList );
@@ -326,34 +301,41 @@ void Body::statusCheck()
     return;
 }
 
-void Body::moveHead(Point2D pos)
-{
-	MotionManager::GetInstance()->SetEnable(true);
-	Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-    Point2D center = Point2D(Camera::WIDTH/2, Camera::HEIGHT/2);
-    Point2D offset = pos - center;
-    offset *= -1; // Inverse X-axis, Y-axis
-    offset.X *= (Camera::VIEW_H_ANGLE / (double)Camera::WIDTH); // pixel per angle
-    offset.Y *= (Camera::VIEW_V_ANGLE / (double)Camera::HEIGHT); // pixel per angle
-    Head::GetInstance()->MoveTracking(offset);
-    return;
-}
-
 void Body::moveHead(int pan, int tilt)
 {
-    if( tilt < -20 || tilt > 60 )
+    int goodPan = pan;
+    int goodTilt = tilt;
+    if( tilt < -20 )
     {
         printf( "bad tilt!\n" );
-        return;
+        goodTilt = -20;
     }
-    if( pan < -90 || pan > 90 )
+    else if( tilt > 60 )
+    {
+        printf( "bad tilt!\n" );
+        goodTilt = 60;
+    }
+
+    if( pan < -90 )
     {
         printf( "bad pan!\n" );
-        return;
+        goodPan = -90;
     }
+    else if( pan > 90 )
+    {
+        printf( "bad pan!\n" );
+        goodPan = 90;
+    }
+
 	MotionManager::GetInstance()->SetEnable(false);
-    cm730.WriteWord(JointData::ID_HEAD_PAN, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(pan), 0);
-    cm730.WriteWord(JointData::ID_HEAD_TILT, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(tilt), 0);
+    cm730.WriteWord(JointData::ID_HEAD_PAN, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(goodPan), 0);
+    cm730.WriteWord(JointData::ID_HEAD_TILT, MX28::P_GOAL_POSITION_L, MX28::Angle2Value(goodTilt), 0);
+
+    int moving = 1;
+    while( moving )
+    {
+        cm730.ReadWord(JointData::ID_HEAD_TILT, MX28::P_MOVING, &moving, 0);
+    }
     return;
 }
 
@@ -369,4 +351,26 @@ int Body::readHeadTilt()
     int headTilt, error;
     cm730.ReadWord(JointData::ID_HEAD_TILT, MX28::P_PRESENT_POSITION_L, &headTilt, &error);
     return( headTilt );
+}
+
+ScanData Body::centerGaze( ScanData card )
+{
+    // get angle per pixel ratio
+    double horizRatio = Camera::VIEW_H_ANGLE / (double)Camera::WIDTH;
+    double vertRatio = Camera::VIEW_V_ANGLE / (double)Camera::HEIGHT;
+
+    Point2D center = Point2D(Camera::WIDTH/2, Camera::HEIGHT/2);
+    Point2D absLoc = card.maculaOrigin + card.location;
+    Point2D displacement = center - absLoc;
+
+    int finalPan = card.pan + (displacement.X * horizRatio);
+    int finalTilt = card.tilt + (displacement.Y * vertRatio);
+
+    moveHead(finalPan, finalTilt);
+
+    ScanData ret;
+    ret.pan = finalPan;
+    ret.tilt = finalTilt;
+
+    return( ret );
 }

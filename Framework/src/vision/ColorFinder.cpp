@@ -163,3 +163,25 @@ Point2D& ColorFinder::GetPosition(Image* hsv_img)
     return m_center_point;
 }
 
+int ColorFinder::GetNumPixels(Image* hsv_img)
+{
+    int count = 0;
+
+    Filtering(hsv_img);
+
+    ImgProcess::Erosion(m_result);
+    ImgProcess::Dilation(m_result);
+
+    for(int y = 0; y < m_result->m_Height; y++)
+    {
+        for(int x = 0; x < m_result->m_Width; x++)
+        {
+            if(m_result->m_ImageData[m_result->m_Width * y + x] > 0)
+            {
+                count++;
+            }
+        }
+    }
+    return( count );
+}
+

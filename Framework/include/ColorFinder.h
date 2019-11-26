@@ -48,6 +48,7 @@ namespace Robot
         void SaveINISettings(minIni* ini, const std::string &section);
 
         Point2D& GetPosition(Image* hsv_img);
+        int GetNumPixels(Image* hsv_img);
     };
 }
 
