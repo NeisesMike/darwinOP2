@@ -106,6 +106,8 @@ class Player
         // check button status
         void statusCheck();
 
+        void shoulderTests();
+
     private:
         //LinuxCM730 linux_cm730;
         //CM730 cm730;

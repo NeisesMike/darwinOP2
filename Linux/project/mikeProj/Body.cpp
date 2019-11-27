@@ -205,15 +205,15 @@ ScanData* Body::scan()
 
     // Camera H angle is 58.0 degrees
     // so we try to partition 174 degrees of viewing here
-    moveHead( 58, 0 );
+    moveHead( -58, -20 );
     refreshEyes(eyes);
-    eyes.partitionScan( percent, 58, 0, retList ); 
-    moveHead( 0, -20 );
+    eyes.partitionScan( percent, -58, -20, retList ); 
+    moveHead( 0, 0 );
     refreshEyes(eyes);
-    eyes.partitionScan( percent, 0, -20, retList ); 
-    moveHead( -58, 0 );
+    eyes.partitionScan( percent, 0, 0, retList ); 
+    moveHead( 58, -20 );
     refreshEyes(eyes);
-    eyes.partitionScan( percent, -58, 0, retList ); 
+    eyes.partitionScan( percent, 58, -20, retList ); 
 
     // ===============================================
     // for each potential card,
@@ -280,28 +280,28 @@ void Body::statusCheck()
 
 void Body::moveHead(int pan, int tilt)
 {
-    int goodPan = pan;
-    int goodTilt = tilt;
-    if( tilt < -20 )
+    int goodPan = pan*-1;
+    int goodTilt = tilt+20;
+    if( tilt < -40 )
     {
         printf( "bad tilt!\n" );
-        goodTilt = -20;
+        goodTilt = -40;
     }
-    else if( tilt > 60 )
+    else if( tilt > 40 )
     {
         printf( "bad tilt!\n" );
-        goodTilt = 60;
+        goodTilt = 40;
     }
 
     if( pan < -90 )
     {
         printf( "bad pan!\n" );
-        goodPan = -90;
+        goodPan = 90;
     }
     else if( pan > 90 )
     {
         printf( "bad pan!\n" );
-        goodPan = 90;
+        goodPan = -90;
     }
 
 	MotionManager::GetInstance()->SetEnable(false);
@@ -328,6 +328,124 @@ int Body::readHeadTilt()
     int headTilt, error;
     cm730.ReadWord(JointData::ID_HEAD_TILT, MX28::P_PRESENT_POSITION_L, &headTilt, &error);
     return( headTilt );
+}
+
+int angleToPitch( bool isRight, int angle )
+{
+    if( isRight )
+    {
+        return( (-1*angle+270)*4100/360 );
+    }
+    return( (angle+90)*4100/360 );
+}
+
+int angleToRoll( bool isRight, int angle )
+{
+    if( isRight )
+    {
+        return( (-1*angle+220)*4100/360 );
+    }
+    return( (angle+140)*4100/360 );
+}
+
+void Body::moveShoulder(bool isRight, int pitch, int roll)
+{
+    int goodPitch = pitch;
+    int goodRoll = roll;
+    if( roll < -85 )
+    {
+        printf( "bad Roll!\n" );
+        goodRoll = -85;
+    }
+    else if( roll > 85 )
+    {
+        printf( "bad roll!\n" );
+        goodRoll = 85;
+    }
+
+    if( pitch < -90 )
+    {
+        printf( "bad pitch!\n" );
+        goodPitch = -90;
+    }
+    else if( pitch > 90 )
+    {
+        printf( "bad pitch!\n" );
+        goodPitch = 90;
+    }
+
+    int pitchVal = angleToPitch( isRight, goodPitch );
+    int rollVal = angleToRoll( isRight, goodRoll );
+
+	MotionManager::GetInstance()->SetEnable(false);
+    if( isRight )
+    {
+        cm730.WriteWord(JointData::ID_R_SHOULDER_PITCH, MX28::P_GOAL_POSITION_L, pitchVal, 0);
+        cm730.WriteWord(JointData::ID_R_SHOULDER_ROLL, MX28::P_GOAL_POSITION_L, rollVal, 0);
+    }
+    else
+    {
+        cm730.WriteWord(JointData::ID_L_SHOULDER_PITCH, MX28::P_GOAL_POSITION_L, pitchVal, 0);
+        cm730.WriteWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_GOAL_POSITION_L, rollVal, 0);
+    }
+
+    int LPmoving = 1;
+    int LRmoving = 1;
+    int RPmoving = 1;
+    int RRmoving = 1;
+    while( LPmoving || LRmoving || RPmoving || RRmoving )
+    {
+        cm730.ReadWord(JointData::ID_L_SHOULDER_PITCH, MX28::P_MOVING, &LPmoving, 0);
+        cm730.ReadWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_MOVING, &LRmoving, 0);
+        cm730.ReadWord(JointData::ID_R_SHOULDER_PITCH, MX28::P_MOVING, &RPmoving, 0);
+        cm730.ReadWord(JointData::ID_R_SHOULDER_ROLL, MX28::P_MOVING, &RRmoving, 0);
+    }
+    return;
+}
+
+int Body::readShoulderPitch(bool isRight)
+{
+    int shoulderPitch, error;
+    if( isRight )
+    {
+        cm730.ReadWord(JointData::ID_R_SHOULDER_PITCH, MX28::P_PRESENT_POSITION_L, &shoulderPitch, &error);
+    }
+    else
+    {
+        cm730.ReadWord(JointData::ID_L_SHOULDER_PITCH, MX28::P_PRESENT_POSITION_L, &shoulderPitch, &error);
+    }
+    return( shoulderPitch );
+}
+
+int Body::readShoulderRoll(bool isRight)
+{
+    int shoulderRoll, error;
+    if( isRight )
+    {
+        cm730.ReadWord(JointData::ID_R_SHOULDER_ROLL, MX28::P_PRESENT_POSITION_L, &shoulderRoll, &error);
+    }
+    else
+    {
+        cm730.ReadWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_PRESENT_POSITION_L, &shoulderRoll, &error);
+    }
+    return( shoulderRoll );
+}
+
+void Body::moveShoulderByGaze( int pan, int tilt )
+{
+    // first calc the pitch using the tilt
+    double pi = 3.1415926;
+    double pitch = atan( 23.0/28.0 * tan( tilt * pi / 180 ) ) * 180 / pi; 
+
+    printf( "tilt is %d, pitch is %f\n", tilt, pitch );
+    
+    // now calc the roll using the pan and tilt
+
+    // well wait that won't do
+    // the pitch works great for the 2D case, but...
+    // I don't think this 3D problem can be solved component-wise
+
+    return;
 }
 
 ScanData Body::centerGaze( ScanData card )

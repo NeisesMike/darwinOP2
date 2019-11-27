@@ -10,7 +10,7 @@ int getMid(int bot, int top)
 int Player::learnRed()
 {
     say("Please show me RED.");
-    body.moveHead( 0, -20 );
+    body.moveHead( 0, -40 );
     sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -77,7 +77,7 @@ int Player::learnRed()
 int Player::learnGreen()
 {
     say("Please show me Green.");
-    body.moveHead( 0, -20 );
+    body.moveHead( 0, -40 );
     sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -144,7 +144,7 @@ int Player::learnGreen()
 int Player::learnBlue()
 {
     say("Please show me Blue.");
-    body.moveHead( 0, -20 );
+    body.moveHead( 0, -40 );
     sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be
@@ -211,7 +211,7 @@ int Player::learnBlue()
 int Player::learnBack()
 {
     say("Please show me the backside color.");
-    body.moveHead( 0, -20 );
+    body.moveHead( 0, -40 );
     sleep(3);
 
     // these are meant to be upper and lower bounds for what the hue might be

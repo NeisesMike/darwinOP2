@@ -20,6 +20,7 @@
 #include "StatusCheck.h"
 #include "knowledge.h"
 #include "Eyes.h"
+#include <math.h>
 
 #ifdef MX28_1024
 #define MOTION_FILE_PATH    "../../../Data/motion_1024.bin"
@@ -50,11 +51,30 @@ class Body
 
         void statusCheck();
 
+        /*
+           * from neutral
+           * pan left and right. face forward at 0 degrees
+           * tilt up and down. face forward at 0 degrees
+           * left is negative
+           * down is negative
+           */
         void moveHead(int pan, int tilt);
-
         int readHeadPan();
-
         int readHeadTilt();
+
+        /*
+           * from neutral
+           * pitch swings forward. straight out at 0 degrees
+           * roll swings out. straight out at 0 degrees
+           * both grow positively down
+           * such that neutral is 90, 90
+           */
+        void moveShoulder(bool isRight, int pitchAngle, int rollAngle);
+        int readShoulderPitch(bool isRight);
+        int readShoulderRoll(bool isRight);
+
+        // do some trig
+        void moveShoulderByGaze( int pan, int tilt );
 
         ScanData centerGaze( ScanData card );
 

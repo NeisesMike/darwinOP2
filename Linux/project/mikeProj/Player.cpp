@@ -48,7 +48,7 @@ void Player::debug()
 
 void Player::learnColors()
 {
-    body.moveHead(0, 10);
+    body.moveHead(0, -10);
     say("Please help me learn my colors.");
 
     printf( "\nred\n" );
@@ -60,9 +60,9 @@ void Player::learnColors()
     printf( "\nback\n" );
     learnBack();
 
-    body.moveHead(0, 20);
+    body.moveHead(0, 0);
     say("Okay, I'm ready to identify those colors.");
-    body.moveHead(0, -10);
+    body.moveHead(0, -30);
     return;
 }
 
@@ -74,7 +74,7 @@ void Player::learnCardSize()
     int greenHue = learnGreen();
 
     say("Now, please show me a green card close to me.");
-    body.moveHead( 0, -20 );
+    body.moveHead( 0, -40 );
     sleep(3);
 
     // learn the max size by growing the match range down from 100
@@ -90,7 +90,7 @@ void Player::learnCardSize()
     }
 
     say("Now, please show me a green card away from me.");
-    body.moveHead( 0, -15 );
+    body.moveHead( 0, -35 );
     sleep(3);
 
     // learn the min size by growing the match range up from 0
@@ -301,7 +301,7 @@ void Player::statusCheck()
 void Player::greet()
 {
     changeEyeColor( GREEN );
-    body.moveHead(0, 10);
+    body.moveHead(0, 0);
     say("Hello, my name is Darwin.");
     return;
 }
@@ -347,6 +347,14 @@ void Player::cardReport()
         }
 
     }
+    return;
+}
+
+void Player::shoulderTests()
+{
+    body.moveShoulderByGaze( 0, 0 );
+    body.moveShoulderByGaze( 0, -20 );
+    body.moveShoulderByGaze( 0, -40 );
     return;
 }
 
