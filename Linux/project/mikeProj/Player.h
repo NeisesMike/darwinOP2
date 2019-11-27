@@ -40,6 +40,9 @@ class Player
 {
     public:
 
+        Player();
+        ~Player();
+
         // simple mode for rapid prototyping
         void debug();
         bool m_debug;
@@ -84,6 +87,7 @@ class Player
         void makeBodyLanguage();
 
         void changeGemColor( Color col );
+        void changeEyeColor( Color col );
 
         // say hello
         void greet();
@@ -101,8 +105,6 @@ class Player
         
         // check button status
         void statusCheck();
-
-        Player();
 
     private:
         //LinuxCM730 linux_cm730;

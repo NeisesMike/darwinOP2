@@ -91,11 +91,11 @@ class Eyes
         ScanData look();
 
         // like look but only includes the central 10% of the image
-        ScanData maculaLook(double percent);
+        ScanData maculaLook(double percent, bool wantTall);
         // always take a new picture
-        ScanData maculaLook(int row, int column, double percent);
+        ScanData maculaLook(int row, int column, double percent, bool wantTall);
         // only includes the designated percent% of each dimension
-        ScanData maculaLook(int row, int column, double percent, bool needTakePicture);
+        ScanData maculaLook(int row, int column, double percent, bool wantTall, bool wantNewImage);
 
         // partition and analyze the image
         // return a list of midpoints
@@ -103,6 +103,9 @@ class Eyes
 
         // grow macula until encompass whole card
         // return center point
+        // grow from center
+        ScanData growMacula();
+        // grow from offset
         ScanData growMacula( ScanData card, int percent );
 
     private:

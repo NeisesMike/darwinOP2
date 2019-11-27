@@ -32,7 +32,7 @@ ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int min_val, double 
         m_min_percent(min_per),
         m_max_percent(max_per),
         color_section(""),
-        m_result(0)
+        m_result(NULL)
 { }
 
 ColorFinder::~ColorFinder()
@@ -45,7 +45,6 @@ void ColorFinder::Filtering(Image *img)
     unsigned int h, s, v;
     int h_max, h_min;
 
-    //if(m_result == NULL)
     delete( m_result );
     m_result = new Image(img->m_Width, img->m_Height, 1);
 

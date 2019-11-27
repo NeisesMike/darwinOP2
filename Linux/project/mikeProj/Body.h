@@ -43,6 +43,7 @@ class Body
         void makeBodyLanguage();
 
         void changeGemColor( Color col );
+        void changeEyeColor( Color col );
 
         // do a look
         ScanData* scan();
@@ -56,6 +57,12 @@ class Body
         int readHeadTilt();
 
         ScanData centerGaze( ScanData card );
+
+        // if final, judge redundancy only by pan tilt
+        void scanFilter( ScanData* input, ScanData* output, int percent, bool isFinal );
+        void reorient( ScanData* input, ScanData* output, int percent );
+        // numPossible is the number of possible card matches, redundant or otherwise
+        void reorientFilter( ScanData* input, ScanData* output, int percent, int numPossible, bool isFinal );
 
         Eyes eyes;
         Body();

@@ -31,9 +31,15 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
 
 }
 
+Player::~Player()
+{
+    delete( kinestheticMemory );
+}
+
 void Player::debug()
 {
     body.eyes.learnRed( 357, false );
+    body.eyes.learnBack( 59, false );
     m_debug = true;
     body.m_debug = true;
     body.eyes.m_debug = true;
@@ -42,15 +48,15 @@ void Player::debug()
 
 void Player::learnColors()
 {
-    body.moveHead(0, 40);
+    body.moveHead(0, 10);
     say("Please help me learn my colors.");
 
     printf( "\nred\n" );
-    learnRed();
+    //learnRed();
     printf( "\ngreen\n" );
-    learnGreen();
+    //learnGreen();
     printf( "\nblue\n" );
-    learnBlue();
+    //learnBlue();
     printf( "\nback\n" );
     learnBack();
 
@@ -65,7 +71,6 @@ void Player::learnCardSize()
     //say("I need you to help me learn how big a card is.");
 
     // to ensure high quality color matching
-    //say("First, please show me what green looks like.");
     int greenHue = learnGreen();
 
     say("Now, please show me a green card close to me.");
@@ -73,9 +78,9 @@ void Player::learnCardSize()
     sleep(3);
 
     // learn the max size by growing the match range down from 100
-    for( double min=13; min>0; min-=.1 )
+    for( double min=9; min>0; min-=.1 )
     {
-        body.eyes.learnCardSize(greenHue, min, 13);
+        body.eyes.learnCardSize(greenHue, min, 9);
         if( body.eyes.tryHitSize(GREEN) )
         {
             body.eyes.setMaxCardSize(min);
@@ -85,7 +90,7 @@ void Player::learnCardSize()
     }
 
     say("Now, please show me a green card away from me.");
-    body.moveHead( 0, 0 );
+    body.moveHead( 0, -15 );
     sleep(3);
 
     // learn the min size by growing the match range up from 0
@@ -240,30 +245,35 @@ void Player::changeGemColor( Color col )
     body.changeGemColor( col );
 }
 
+void Player::changeEyeColor( Color col )
+{
+    body.changeEyeColor( col );
+}
+
 void Player::interpretColor( int col )
 {
     if((col & RED) != 0 && lastDetected != RED)
     {
         lastDetected = RED;
-        body.changeGemColor( RED );
+        changeGemColor( RED );
         festival_say_text("red");
     }
     else if((col & GREEN) != 0 &lastDetected != GREEN)
     {
         lastDetected = GREEN;
-        body.changeGemColor( GREEN );
+        changeGemColor( GREEN );
         festival_say_text("green");
     }
     else if((col & BLUE) != 0 &lastDetected != BLUE)
     {
         lastDetected = BLUE;
-        body.changeGemColor( BLUE );
+        changeGemColor( BLUE );
         festival_say_text("blue");
     }
     else if((col & BACKSIDE) != 0 &lastDetected != BACKSIDE)
     {
         lastDetected = BACKSIDE;
-        body.changeGemColor( BACKSIDE );
+        changeGemColor( BACKSIDE );
         festival_say_text("backside");
     }
     return;
@@ -277,6 +287,7 @@ void Player::observe()
 
 void Player::scan()
 {
+    changeEyeColor( PURPLE );
     kinestheticMemory = body.scan();
     return;
 }
@@ -289,13 +300,15 @@ void Player::statusCheck()
 
 void Player::greet()
 {
-    body.moveHead(0, 30);
+    changeEyeColor( GREEN );
+    body.moveHead(0, 10);
     say("Hello, my name is Darwin.");
     return;
 }
 
 void Player::cardReport()
 {
+    changeEyeColor( BLUE );
     int iter = 0;
     // surely there won't be 1000 cards...
     for( int i=0; i<1000; i++ )
@@ -305,27 +318,31 @@ void Player::cardReport()
         {
             break;
         }
+        if( temp.color == UNKNOWN )
+        {
+            continue;
+        }
 
         body.centerGaze( temp );
 
         if(temp.color & RED)
         {
-            body.changeGemColor( RED );
+            changeGemColor( RED );
             festival_say_text("Here is a red card.");
         }
         else if(temp.color & GREEN)
         {
-            body.changeGemColor( GREEN );
+            changeGemColor( GREEN );
             festival_say_text("Here is a green card.");
         }
         else if(temp.color & BLUE)
         {
-            body.changeGemColor( BLUE );
+            changeGemColor( BLUE );
             festival_say_text("Here is a blue card.");
         }
         else if(temp.color & BACKSIDE)
         {
-            body.changeGemColor( BACKSIDE );
+            changeGemColor( BACKSIDE );
             festival_say_text("Here is an overturned card.");
         }
 

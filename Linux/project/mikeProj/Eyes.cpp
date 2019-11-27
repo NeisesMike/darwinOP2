@@ -5,13 +5,14 @@
  */
 
 #include "Eyes.h"
+#include "eyeLibrary.cpp"
 #include <stdio.h>
 
 Eyes::Eyes()
 {
     m_debug = true;
-    m_minCardSize = 2;
-    m_maxCardSize = 100;
+    m_minCardSize = 3;
+    m_maxCardSize = 80;
 
     minIni* ini = new minIni(INI_FILE_PATH);
 
@@ -37,6 +38,7 @@ Eyes::Eyes()
     backside_finder->LoadINISettings(ini, "BACKSIDE");
     httpd::backside_finder = backside_finder;
 
+    /* UNUSED COLORS
 
        orange_finder = new ColorFinder(0, 0, 45, 0, 24, 50.0);
        orange_finder->LoadINISettings(ini, "ORANGE");
@@ -50,7 +52,6 @@ Eyes::Eyes()
        purple_finder->LoadINISettings(ini, "PURPLE");
        httpd::purple_finder = purple_finder;
 
-    /* UNUSED COLORS
        pink_finder = new ColorFinder(305, 20, 9, 0, 0.3, 50.0);
        pink_finder->LoadINISettings(ini, "PINK");
        httpd::pink_finder = pink_finder;
@@ -72,6 +73,7 @@ Eyes::Eyes()
 */
 
     httpd::ini = ini;
+    delete( ini );
 }
 
 Eyes::~Eyes()
@@ -79,6 +81,7 @@ Eyes::~Eyes()
     delete( red_finder );
     delete( green_finder );
     delete( blue_finder );
+    delete( backside_finder );
     delete( streamer );
 }
 
@@ -215,6 +218,7 @@ ScanData Eyes::look()
 void Eyes::learnRed(int hue, bool isLearning)
 {
     minIni* ini = new minIni(INI_FILE_PATH);
+    delete( red_finder );
     if( isLearning )
     {
         red_finder = new ColorFinder(hue, 10, 45, 0, 30, 80);
@@ -230,6 +234,7 @@ void Eyes::learnRed(int hue, bool isLearning)
 void Eyes::learnGreen(int hue, bool isLearning)
 {
     minIni* ini = new minIni(INI_FILE_PATH);
+    delete( green_finder );
     if( isLearning )
     {
         green_finder = new ColorFinder(hue, 10, 20, 0, 30, 80);
@@ -245,6 +250,7 @@ void Eyes::learnGreen(int hue, bool isLearning)
 void Eyes::learnBlue(int hue, bool isLearning)
 {
     minIni* ini = new minIni(INI_FILE_PATH);
+    delete( blue_finder );
     if( isLearning )
     {
         blue_finder = new ColorFinder(hue, 10, 30, 30, 30, 80);
@@ -260,13 +266,14 @@ void Eyes::learnBlue(int hue, bool isLearning)
 void Eyes::learnBack(int hue, bool isLearning)
 {
     minIni* ini = new minIni(INI_FILE_PATH);
+    delete( backside_finder );
     if( isLearning )
     {
-        backside_finder = new ColorFinder(hue, 20, 0, 35, 30, 80);
+        backside_finder = new ColorFinder(hue, 10, 5, 35, 30, 80);
     }
     else
     {
-        backside_finder = new ColorFinder(hue, 60, 0, 35, m_minCardSize, m_maxCardSize);
+        backside_finder = new ColorFinder(hue, 30, 0, 38, m_minCardSize, m_maxCardSize);
     }
     httpd::backside_finder = backside_finder;
     delete( ini );
@@ -275,6 +282,7 @@ void Eyes::learnBack(int hue, bool isLearning)
 void Eyes::learnCardSize( int hue, int min, int max )
 {
     minIni* ini = new minIni(INI_FILE_PATH);
+    delete( green_finder );
     green_finder = new ColorFinder(hue, 40, 20, 20, min, max);
     httpd::green_finder = green_finder;
     delete( ini );
@@ -296,41 +304,75 @@ int coord2maculaindex( int row, int column, int macStartRow, int macStartColumn,
 
 
 // look at the center
-ScanData Eyes::maculaLook(double percent)
+ScanData Eyes::maculaLook(double percent, bool wantTall)
 {
     // calc the right starting coordinates
     int macH = Camera::HEIGHT/(100.0/percent);
     int macW = Camera::WIDTH/(100.0/percent);
 
+    if( wantTall )
+    {
+        macW = Camera::WIDTH/(100.0/percent)/2;
+    }
+
     int startRow = (Camera::HEIGHT - macH)/2 + 1;
     int startCol = (Camera::WIDTH - macW)/2 + 1;
 
     // the first pixel of the percent% macula 
-    return( maculaLook(startRow, startCol, percent) );
+    return( maculaLook(startRow, startCol, percent, wantTall) );
 }
 
 // look at this location
-ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent)
+ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, bool wantTall)
 {
-    return( maculaLook(macStartRow, macStartColumn, percent, true) );
+    return( maculaLook(macStartRow, macStartColumn, percent, wantTall, true) );
 }
 
 // fully generic
-ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, bool needTakePicture)
+ScanData Eyes::maculaLook(int aMacStartRow, int aMacStartColumn, double percent, bool wantTall, bool wantNewImage)
 {
+    int macStartRow = aMacStartRow;
+    int macStartColumn = aMacStartColumn;
+    
     Point2D red_pos, green_pos, blue_pos, back_pos;
     Image* rgb_output = new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE);
     Image* hsv_output = new Image(Camera::WIDTH/(100.0/percent), Camera::HEIGHT/(100.0/percent), Image::HSV_PIXEL_SIZE);
     int macH = Camera::HEIGHT/(100.0/percent);
     int macW = Camera::WIDTH/(100.0/percent);
 
-    if( needTakePicture )
+    if( wantTall )
+    {
+        macW = Camera::WIDTH/(100.0/percent)/2;
+    }
+    // determine whether the arguments will take us out of the image bounds
+    if( macStartRow < 0 )
+    {
+        macStartRow = 0;
+    }
+    else if( macStartRow + macH > Camera::HEIGHT )
+    {
+        macStartRow = Camera::HEIGHT - macH;        
+    }
+
+    if( macStartColumn < 0 )
+    {
+        macStartColumn = 0;
+    }
+    else if( macStartColumn + macW > Camera::WIDTH )
+    {
+        macStartColumn = Camera::WIDTH - macW;        
+    }
+
+    // check if we need to take a picture
+    if( wantNewImage )
     {
         LinuxCamera::GetInstance()->CaptureFrame(); 
     }
+
+    // copy the camera image into rgb_output
     memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
 
-    // selectively a chunk of the original imag
+    // selectively copy a chunk of the original image
     Image* hsvFrame = LinuxCamera::GetInstance()->fbuffer->m_HSVFrame;
     for( int row=macStartRow; row<macStartRow+macH; row++ )
     {
@@ -357,7 +399,7 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
         {
             for( int column=macStartColumn; column<macStartColumn+macW; column++ )
             {
-                r = 0; g = 0; b = 0;
+                r = 128; g = 128; b = 128;
                 int smallIndex = coord2maculaindex( row, column, macStartRow, macStartColumn, percent );
                 int bigIndex = coord2index( row, column );
 
@@ -397,43 +439,52 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
         streamer->send_image(rgb_output);
     }
 
-    int detected_color = 0;
+    int redPixels = red_finder->GetNumPixels(hsv_output);
+    int bluePixels = blue_finder->GetNumPixels(hsv_output);
+    int greenPixels = green_finder->GetNumPixels(hsv_output);
+    int backsidePixels = backside_finder->GetNumPixels(hsv_output);
 
-    detected_color |= (red_pos.X == -1)? 0 : RED;
-    detected_color |= (green_pos.X == -1)? 0 : GREEN;
-    detected_color |= (blue_pos.X == -1)? 0 : BLUE;
+    Color dominantColor = getDominantColor( redPixels, bluePixels, greenPixels, backsidePixels );
 
     ScanData ret = {};
     Point2D macOrigin = Point2D(macStartColumn, macStartRow);
     ret.maculaOrigin = macOrigin;
-    if( (detected_color & RED) != 0 )
+
+    if( dominantColor == RED )
     {
+//        printf( "red!\n" );
         ret.color = RED;
         ret.location = red_pos;
-        ret.numPixels = red_finder->GetNumPixels(hsv_output);
+        ret.numPixels = redPixels;
     }
-    else if( (detected_color & GREEN) != 0 )
+    else if( dominantColor == BLUE )
     {
-        ret.color = GREEN;
-        ret.location = green_pos;
-        ret.numPixels = green_finder->GetNumPixels(hsv_output);
-    }
-    else if( (detected_color & BLUE) != 0 )
-    {
+//        printf( "blue!\n" );
         ret.color = BLUE;
         ret.location = blue_pos;
-        ret.numPixels = blue_finder->GetNumPixels(hsv_output);
+        ret.numPixels = bluePixels;
     }
-    else if( (detected_color & BACKSIDE) != 0 )
+    else if( dominantColor == GREEN )
     {
+//        printf( "green!\n" );
+        ret.color = GREEN;
+        ret.location = green_pos;
+        ret.numPixels = greenPixels;
+    }
+    else if( dominantColor == BACKSIDE )
+    {
+//        printf( "backside!\n" );
         ret.color = BACKSIDE;
         ret.location = back_pos;
-        ret.numPixels = backside_finder->GetNumPixels(hsv_output);
+        ret.numPixels = backsidePixels;
     }
     else
     {
+//        printf( "unknown!\n" );
         ret.color = UNKNOWN;
-        ret.location = red_pos;
+        Point2D origin = Point2D(0,0);
+        ret.location = origin;
+        ret.numPixels = 0;
     }
 
     delete( rgb_output );
@@ -446,7 +497,7 @@ ScanData Eyes::maculaLook(int macStartRow, int macStartColumn, double percent, b
 void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
 {
     int macH = Camera::HEIGHT/(100.0/percent);
-    int macW = Camera::WIDTH/(100.0/percent);
+    int macW = Camera::WIDTH/(100.0/percent)/2;
     LinuxCamera::GetInstance()->CaptureFrame(); 
 
     int iter = 0;
@@ -466,7 +517,7 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
             // can probably get a speedup out of not taking a picture every time
             // is bugged now, tho
             // always scans over the same picture :shrug:
-            ScanData temp = maculaLook( row, col, percent );
+            ScanData temp = maculaLook( row, col, percent, true );
             if( temp.color != UNKNOWN )
             {
                 temp.tilt = tilt;
@@ -487,19 +538,17 @@ void Eyes::partitionScan( double percent, int pan, int tilt, ScanData* retList )
     return;
 }
 
-ScanData Eyes::growMacula( ScanData card, int percent )
+ScanData Eyes::growMacula()
 {
     ScanData result;
     int maxPixels = 0;
     int numPixels = 0;
 
-    int startRow = card.location.X - Camera::WIDTH/(100/percent)/2;
-    int startCol = card.location.Y - Camera::HEIGHT/(100/percent)/2;
-
-    for( int iPercent=0; iPercent<100; iPercent++ )
+    for( int iPercent=1; iPercent<100; iPercent+=4 )
     {
-        result = maculaLook(iPercent);
+        result = maculaLook(iPercent, true);
         numPixels = result.numPixels; 
+
         if( numPixels > maxPixels )
         {
             maxPixels = numPixels;
@@ -513,6 +562,50 @@ ScanData Eyes::growMacula( ScanData card, int percent )
             break;
         }
     }
+    printf( "max is %d, num is %d\n\n", maxPixels, numPixels );
+    return( result );
+}
+
+ScanData Eyes::growMacula( ScanData card, int percent )
+{
+    ScanData result;
+    int maxPixels = 0;
+    int numPixels = 0;
+
+    int centerCol = card.maculaOrigin.X + card.location.X;
+    int centerRow = card.maculaOrigin.Y + card.location.Y;
+
+    int startRow = 0;
+    int startCol = 0;
+
+    for( int iPercent=1; iPercent<100; iPercent+=4 )
+    {
+        if( maxPixels != 0 )
+        {
+            centerCol = result.maculaOrigin.X + result.location.X;
+            centerRow = result.maculaOrigin.Y + result.location.Y;
+        }
+
+        startRow = centerRow - Camera::HEIGHT * iPercent / 200;
+        startCol = centerCol - Camera::WIDTH/2 * iPercent / 200;
+        result = maculaLook(startRow, startCol, iPercent, true);
+        numPixels = result.numPixels; 
+
+        if( numPixels > maxPixels )
+        {
+            maxPixels = numPixels;
+        }
+        else if( numPixels == 0 )
+        {
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+    printf( "max is %d, num is %d\n\n", maxPixels, numPixels );
+
     return( result );
 }
 
