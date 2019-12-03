@@ -184,7 +184,7 @@ void refreshEyes(Eyes& eyes)
 
 ScanData* Body::scan()
 {
-    int percent = 30;
+    int percent = 25;
     int numHeadPositions = 3;
 
     // *8 because a macula can get a hit on the same position 8 times
@@ -348,19 +348,12 @@ int angleToRoll( bool isRight, int angle )
     return( (angle+140)*4100/360 );
 }
 
-void Body::moveShoulder( int pan, int tilt )
-{
-    if( pan > 0 )
-    {
-        moveShoulder( true, tilt, pan );
-        return;
-    }
-        moveShoulder( false, tilt, pan );
-        return;
-}
-
 void Body::moveShoulder(bool isRight, int pitch, int roll)
 {
+    //make elbows rigid
+    cm730.WriteWord(JointData::ID_L_ELBOW, MX28::P_GOAL_POSITION_L, 3109, 0);
+    cm730.WriteWord(JointData::ID_R_ELBOW, MX28::P_GOAL_POSITION_L, 996, 0);
+
     int goodPitch = pitch;
     int goodRoll = roll;
     if( roll < -85 )
@@ -439,23 +432,39 @@ int Body::readShoulderRoll(bool isRight)
     {
         cm730.ReadWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_PRESENT_POSITION_L, &shoulderRoll, &error);
     }
+    cm730.ReadWord(JointData::ID_L_ELBOW, MX28::P_PRESENT_POSITION_L, &shoulderRoll, &error);
+    printf( "Left elbow is %d\n", shoulderRoll );
+    cm730.ReadWord(JointData::ID_R_ELBOW, MX28::P_PRESENT_POSITION_L, &shoulderRoll, &error);
+    printf( "Right elbow is %d\n", shoulderRoll );
     return( shoulderRoll );
 }
 
 void Body::moveShoulderByGaze( int pan, int tilt )
 {
-    // first calc the pitch using the tilt
-    double pi = 3.1415926;
-    double pitch = atan( 23.0/28.0 * tan( tilt * pi / 180 ) ) * 180 / pi; 
+    // this doesn't work
 
-    printf( "tilt is %d, pitch is %f\n", tilt, pitch );
-    
-    // now calc the roll using the pan and tilt
+    double overIt = 0;
+    if( pan > 0 )
+    {
+        overIt = 90-pan;
+    }
+    else
+    {
+        overIt = 90+pan;
+    }
 
-    // well wait that won't do
-    // the pitch works great for the 2D case, but...
-    // I don't think this 3D problem can be solved component-wise
+    double adjustRoll = tilt;
+    double adjustPitch = tilt*sin(-1*pan);
+    double temp =  (90-overIt)*cos(pan);
 
+    if( pan > 0 )
+    {
+        moveShoulder( true, adjustPitch, overIt-adjustRoll );
+    }
+    else
+    {
+        moveShoulder( false, adjustPitch, overIt-adjustRoll );
+    }
     return;
 }
 
@@ -469,7 +478,7 @@ ScanData Body::centerGaze( ScanData card )
     Point2D absLoc = card.maculaOrigin + card.location;
     Point2D displacement = center - absLoc;
 
-    int finalPan = card.pan + (displacement.X * horizRatio);
+    int finalPan = card.pan - (displacement.X * horizRatio);
     int finalTilt = card.tilt + (displacement.Y * vertRatio);
 
     moveHead(finalPan, finalTilt);

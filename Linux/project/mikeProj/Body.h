@@ -69,7 +69,6 @@ class Body
            * both grow positively down
            * such that neutral is 90, 90
            */
-        void moveShoulder(int pan, int tilt);
         void moveShoulder(bool isRight, int pitchAngle, int rollAngle);
         int readShoulderPitch(bool isRight);
         int readShoulderRoll(bool isRight);

@@ -68,7 +68,7 @@ class Player
         // make a choice
         // NOTE: while this makes Darwin more efficient
         // it means he cannot play drop in games
-        int chooseCard();
+        int chooseCard(int partnerCardIndex);
 
         // verbally and/or somatically
         void indicateChoice( int pos );
@@ -79,12 +79,10 @@ class Player
 
         void updateMood(bool lastMatched, bool lastCardWasNew);
 
-        // return true if the card upturned was new 
-        bool waitForPartner();
+        // find an upturned card and return its index in the kinesthetic mem
+        int waitForPartner();
 
         void say(const EST_String str);
-
-        void makeBodyLanguage();
 
         void changeGemColor( Color col );
         void changeEyeColor( Color col );
@@ -107,6 +105,12 @@ class Player
         void statusCheck();
 
         void shoulderTests();
+        
+        void nod();
+
+        ScanData getCardAtMem( int i );
+        void updateMem( int i, bool isMatched );
+        void updateMem( int i, Color color );
 
     private:
         //LinuxCM730 linux_cm730;

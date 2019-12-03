@@ -43,6 +43,7 @@ struct ScanData
     Color color;
     Point2D maculaOrigin;
     int numPixels;
+    bool isMatched;
 
     struct ScanData& operator=(const ScanData& rhs)
     {

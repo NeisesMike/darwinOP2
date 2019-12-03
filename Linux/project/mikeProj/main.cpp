@@ -29,33 +29,77 @@ int main(void)
     /*
     DarCon->changeGemColor( YELLOW );
     DarCon->changeEyeColor( YELLOW );
+    DarCon->shoulderTests();
     */
 
-    /*
     DarCon->greet();
     DarCon->changeGemColor( BLUE );
+    DarCon->changeEyeColor( BLUE );
     DarCon->statusCheck();
-    */
 
     //DarCon->learnCardSize();
 
-    /*
     DarCon->learnColors();
     DarCon->say( "Please set out some cards now." );
-    DarCon->say( "I will wait ten seconds." );
+    DarCon->say( "I will wait 10 seconds." );
     sleep(10);
-    */
+
+    /*
     DarCon->scan();
     DarCon->cardReport();
+    */
 
-    //DarCon->shoulderTests();
+    DarCon->scan();
+    DarCon->nod();
 
-    printf( "done!\n" );
+    int unmatchedPairs = 3;
 
-    while(1)
+    while( unmatchedPairs > 0 )
     {
-        DarCon->observe(); 
+        DarCon->say( "your turn" );
+        // wait for partner's turn
+        sleep(3);
+        int partnerCardIndex = DarCon->waitForPartner();
+        ScanData partnerCard = DarCon->getCardAtMem( partnerCardIndex );
+
+        DarCon->say( "my turn" );
+        // take turn
+        int choice = DarCon->chooseCard( partnerCardIndex );
+        DarCon->indicateChoice( choice );
+        ScanData ourCard = DarCon->getCardAtMem( choice );
+        sleep(4);
+
+        // see how we did
+        if( partnerCard.color == ourCard.color )
+        {
+            // it's a match!
+            DarCon->updateMem( partnerCardIndex, true );
+            DarCon->updateMem( choice, true );
+            
+            DarCon->nod();
+            unmatchedPairs--;
+        }
+        else
+        {
+            // gotta see what we turned over
+            Color choiceColor = DarCon->getCardAtPosition( choice );
+            DarCon->updateMem( choice, choiceColor );
+            if( choiceColor == partnerCard.color )
+            {
+                DarCon->say( "lucky!" );
+                DarCon->updateMem( partnerCardIndex, true );
+                DarCon->updateMem( choice, true );
+                unmatchedPairs--;
+            }
+            else
+            {
+                DarCon->say( "no match" );
+            }
+        }
     }
+
+    DarCon->say( "Good game" );
+    DarCon->nod();
 
     delete( DarCon );
     return(0);

@@ -11,7 +11,7 @@
 Eyes::Eyes()
 {
     m_debug = true;
-    m_minCardSize = 3;
+    m_minCardSize = 4;
     m_maxCardSize = 80;
 
     minIni* ini = new minIni(INI_FILE_PATH);

@@ -13,6 +13,7 @@ Player::Player() : body(Body())// , linux_cm730(LinuxCM730("/dev/ttyUSB0")), cm7
     for(int i=0; i<8; i++)
     {
         boardMemory[i] = UNKNOWN;
+        boardMatchedMemory[i] = false;
     }
 
     lastDetected = UNKNOWN;
@@ -39,7 +40,7 @@ Player::~Player()
 void Player::debug()
 {
     body.eyes.learnRed( 357, false );
-    //body.eyes.learnBack( 59, false );
+    body.eyes.learnBack( 59, false );
     m_debug = true;
     body.m_debug = true;
     body.eyes.m_debug = true;
@@ -52,11 +53,11 @@ void Player::learnColors()
     say("Please help me learn my colors.");
 
     printf( "\nred\n" );
-    //learnRed();
+    learnRed();
     printf( "\ngreen\n" );
-    //learnGreen();
+    learnGreen();
     printf( "\nblue\n" );
-    //learnBlue();
+    learnBlue();
     printf( "\nback\n" );
     learnBack();
 
@@ -107,21 +108,44 @@ void Player::learnCardSize()
     return;
 }
 
-// TODO
-Color Player::getCardAtPosition( int pos )
+Color Player::getCardAtPosition( int index )
 {
-    // watch out for hands ( red ? )
-    return( UNKNOWN );
+    ScanData temp = kinestheticMemory[ index ];
+
+    //check it out
+    body.centerGaze( temp );
+    while( true )
+    {
+        ScanData result = body.eyes.maculaLook(30, true);
+        if( result.color != UNKNOWN && result.color != BACKSIDE )
+        {
+            return( result.color );
+        }
+    }
 }
 
-int Player::chooseCard()
+int Player::chooseCard(int partnerCardIndex)
 {
     // case: know a match
-    int i;
-    for( i=0; i<8; i++ )
+    for( int i=0; i<100; i++ )
     {
-        if( boardMemory[i] == theirCard && i != theirCardPos )
+        ScanData thisCard = kinestheticMemory[i];
+        if( thisCard.location.X == -1000 )
         {
+            printf( "breaking\n" );
+            break;
+        }
+        
+        if( i == partnerCardIndex )
+        {
+            printf( "skipping\n" );
+            continue;
+        }
+
+        if( thisCard.color == kinestheticMemory[partnerCardIndex].color )
+        {
+            say( "Ah!" );
+            say( "I know." );
             return( i );
         }
     }
@@ -129,23 +153,40 @@ int Player::chooseCard()
     // case: don't know a match
     while( true )
     {
-        int choice = rand() % 8;
-        if( boardMemory[choice] == UNKNOWN )
+        for( int i=0; i<100; i++ )
         {
-            return( choice );
+            ScanData thisCard = kinestheticMemory[i];
+            if( thisCard.location.X == -1000 )
+            {
+                printf( "breaking\n" );
+                break;
+            }
+            
+            if( i == partnerCardIndex )
+            {
+                printf( "skipping\n" );
+                continue;
+            }
+
+            if( thisCard.color == UNKNOWN )
+            {
+                say( "Humm" );
+                return( i );
+            }
         }
     }
 }
 
 // TODO
-void Player::indicateChoice( int pos )
+void Player::indicateChoice( int choice )
 {
-    // verbally indicate pos + 1 for sanity
+    ScanData thisCard = kinestheticMemory[choice];
 
     // turn gaze towards the appropriate card
-    //double thisLocation = kinestheticMemory[pos];
+    body.centerGaze( thisCard );
 
-    // maybe point towards the appropriate card?
+    // announce when ready
+    say( "This card." );
 
     return;
 }
@@ -170,62 +211,39 @@ bool Player::analyzeResults(int ourCardPos)
     return( false );
 }
 
-// TODO
-void Player::updateMood(bool lastMatched, bool lastCardWasNew)
-{
-    if(lastMatched)
-    {
-        mood[0]++;
-    }
-    else
-    {
-        mood[0]--;
-    }
-
-    if(lastCardWasNew)
-    {
-        mood[2]++;
-    }
-    else
-    {
-        mood[2]--;
-    }
-}
-
-bool Player::waitForPartner()
+int Player::waitForPartner()
 {
     // look at all cards in sequence that aren't already matched
-    Color thisCard = UNKNOWN;
-    int thisCardPos = 0;
-    while( thisCard == UNKNOWN )
+    bool isWaiting = true;
+    while( isWaiting )
     {
-        for( int i=0; i<8; i++ )
+        for( int i=0; i<1000; i++ )
         {
-            // skip it if we already know its been matched
-            if( boardMatchedMemory[i] )
+            ScanData temp = kinestheticMemory[i];
+            if( temp.location.X == -1000 )
             {
+                printf( "reached the end\n" );
+                sleep(2);
+                break;
+            }
+
+            if( temp.isMatched == true )
+            {
+                printf( "skipping\n");
                 continue;
             }
 
-            // otherwise, get the color
-            // update memory
-            theirCard = getCardAtPosition(i);
-            theirCardPos = i;
+            //check it out
+            body.centerGaze( temp );
+            usleep(500000);
+            ScanData result = body.eyes.maculaLook(30, true);
+            if( result.color != UNKNOWN && result.color != BACKSIDE )
+            {
+                updateMem( i, result.color );
+                return( i );
+            }
         }
     }
-
-    // check too see if we knew this card already
-    if( boardMemory[thisCardPos] != thisCard )
-    {
-        if( boardMemory[thisCardPos] == UNKNOWN )
-        {
-            boardMemory[thisCardPos] = thisCard;
-            return( true );
-        }
-        // TODO
-        // "I must be confused. I thought another card was there!"
-    }
-    return( false );
 }
 
 void Player::say(const EST_String str)
@@ -234,11 +252,6 @@ void Player::say(const EST_String str)
     return;
 }
 
-// TODO
-void Player::makeBodyLanguage()
-{
-    return;
-}
 
 void Player::changeGemColor( Color col )
 {
@@ -289,6 +302,15 @@ void Player::scan()
 {
     changeEyeColor( PURPLE );
     kinestheticMemory = body.scan();
+    for( int i=0; i<1000; i++ )
+    {
+        if( kinestheticMemory[i].location.X == -1000 )
+        {
+            break;
+        }
+        updateMem( i, false );
+        updateMem( i, UNKNOWN );
+    }
     return;
 }
 
@@ -300,9 +322,10 @@ void Player::statusCheck()
 
 void Player::greet()
 {
-    changeEyeColor( GREEN );
+    changeEyeColor( BLUE );
     body.moveHead(0, 0);
-    say("Hello, my name is Darwin.");
+    say("Hello.");
+    say("My name is Darwin.");
     return;
 }
 
@@ -325,7 +348,7 @@ void Player::cardReport()
 
         //body.centerGaze( temp );
         body.moveHead( temp.pan, temp.tilt );
-        body.moveShoulder( temp.pan, temp.tilt );
+        body.moveShoulderByGaze( temp.pan, temp.tilt );
 
         if(temp.color & RED)
         {
@@ -349,14 +372,58 @@ void Player::cardReport()
         }
 
     }
+    body.moveShoulder( true, 90, 60 );
+    body.moveShoulder( true, 90, 80 );
+    body.moveShoulder( false, 90, 60 );
+    body.moveShoulder( false, 90, 80 );
     return;
 }
 
 void Player::shoulderTests()
 {
-    body.moveShoulderByGaze( 0, 0 );
-    body.moveShoulderByGaze( 0, -20 );
-    body.moveShoulderByGaze( 0, -40 );
+    body.moveShoulder( true, 90, 80 );
+    body.moveShoulder( false, 90, 80 );
+
+    // try pointing at 6 cards fanned around you
+    body.moveShoulderByGaze( -75, -22 );
+    sleep(1);
+    body.moveShoulderByGaze( -45, -22 );
+    sleep(1);
+    body.moveShoulderByGaze( -15, -27 );
+    sleep(1);
+    body.moveShoulderByGaze( 15, -27 );
+    sleep(1);
+    body.moveShoulderByGaze( 45, -22 );
+    sleep(1);
+    body.moveShoulderByGaze( 75, -22 );
+
+    return;
+}
+
+void Player::nod()
+{
+    body.moveHead( 0, 0 );
+    sleep(1);
+    body.moveHead( 0, -15 );
+    usleep(50000);
+    body.moveHead( 0, 0 );
+    return;
+}
+
+ScanData Player::getCardAtMem( int index )
+{
+    return( kinestheticMemory[index] );
+}
+
+void Player::updateMem( int index, bool isMatched )
+{
+    kinestheticMemory[index].isMatched = isMatched;
+    return;
+}
+
+void Player::updateMem( int index, Color color )
+{
+    kinestheticMemory[index].color = color;
     return;
 }
 

@@ -63,8 +63,6 @@ void Body::scanFilter( ScanData* input, ScanData* output, int percent, bool isFi
         }
         if( !doWeAlreadyHaveThisCard )
         {
-            printf( "pan tilt is %d %d\n", temp.pan, temp.tilt );
-            printf( "X Y is %f %f\n", temp.location.X, temp.location.Y );
             output[iter] = temp;
             iter++;
             output[iter] = stop;
