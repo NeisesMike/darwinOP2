@@ -562,7 +562,6 @@ ScanData Eyes::growMacula()
             break;
         }
     }
-    printf( "max is %d, num is %d\n\n", maxPixels, numPixels );
     return( result );
 }
 
@@ -604,7 +603,6 @@ ScanData Eyes::growMacula( ScanData card, int percent )
             break;
         }
     }
-    printf( "max is %d, num is %d\n\n", maxPixels, numPixels );
 
     return( result );
 }

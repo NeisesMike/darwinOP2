@@ -44,11 +44,11 @@ int main(void)
     DarCon->say( "Please set out some cards now." );
     DarCon->say( "I will wait ten seconds." );
     sleep(10);
+    */
     DarCon->scan();
     DarCon->cardReport();
-    */
 
-    DarCon->shoulderTests();
+    //DarCon->shoulderTests();
 
     printf( "done!\n" );
 

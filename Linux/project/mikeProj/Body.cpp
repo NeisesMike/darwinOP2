@@ -208,9 +208,9 @@ ScanData* Body::scan()
     moveHead( -58, -20 );
     refreshEyes(eyes);
     eyes.partitionScan( percent, -58, -20, retList ); 
-    moveHead( 0, 0 );
+    moveHead( 0, -40 );
     refreshEyes(eyes);
-    eyes.partitionScan( percent, 0, 0, retList ); 
+    eyes.partitionScan( percent, 0, -40, retList ); 
     moveHead( 58, -20 );
     refreshEyes(eyes);
     eyes.partitionScan( percent, 58, -20, retList ); 
@@ -346,6 +346,17 @@ int angleToRoll( bool isRight, int angle )
         return( (-1*angle+220)*4100/360 );
     }
     return( (angle+140)*4100/360 );
+}
+
+void Body::moveShoulder( int pan, int tilt )
+{
+    if( pan > 0 )
+    {
+        moveShoulder( true, tilt, pan );
+        return;
+    }
+        moveShoulder( false, tilt, pan );
+        return;
 }
 
 void Body::moveShoulder(bool isRight, int pitch, int roll)

@@ -39,7 +39,7 @@ Player::~Player()
 void Player::debug()
 {
     body.eyes.learnRed( 357, false );
-    body.eyes.learnBack( 59, false );
+    //body.eyes.learnBack( 59, false );
     m_debug = true;
     body.m_debug = true;
     body.eyes.m_debug = true;
@@ -323,7 +323,9 @@ void Player::cardReport()
             continue;
         }
 
-        body.centerGaze( temp );
+        //body.centerGaze( temp );
+        body.moveHead( temp.pan, temp.tilt );
+        body.moveShoulder( temp.pan, temp.tilt );
 
         if(temp.color & RED)
         {
